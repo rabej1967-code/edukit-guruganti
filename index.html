@@ -1,0 +1,1435 @@
+<!doctype html>
+<html lang="ms" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Guru Ganti Pro</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=Poppins:wght@600;700;800&amp;display=swap" rel="stylesheet">
+  <script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { body: ['Inter', 'sans-serif'], heading: ['Poppins', 'sans-serif'] }
+    }
+  }
+}
+</script>
+  <style>
+html, body { height: 100%; margin: 0; }
+* { font-family: 'Inter', sans-serif; }
+.heading { font-family: 'Poppins', sans-serif; }
+.tab-active { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
+.tab-inactive { background: #f1f5f9; color: #475569; transition: all 0.2s; }
+.tab-inactive:hover { background: #e2e8f0; transform: translateY(-1px); }
+.fade-in { animation: fadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.premium-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.premium-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+.stat-card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; }
+.btn-primary { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; font-weight: 600; border-radius: 8px; padding: 10px 20px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(15, 23, 42, 0.3); }
+.btn-secondary { background: #f1f5f9; color: #475569; font-weight: 600; border-radius: 8px; padding: 10px 20px; border: 1px solid #cbd5e1; cursor: pointer; transition: all 0.2s; }
+.btn-secondary:hover { background: #e2e8f0; }
+.input-field { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 16px; font-size: 14px; transition: all 0.2s; }
+.input-field:focus { outline: none; border-color: #0f172a; background: white; box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1); }
+.toast { position:fixed;top:20px;right:20px;z-index:9999;padding:16px 24px;border-radius:12px;color:#fff;font-weight:600;animation:slideIn 0.3s ease,fadeOut 0.3s ease 2.7s;box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+@keyframes slideIn { from{transform:translateX(120px);opacity:0} to{transform:translateX(0);opacity:1} }
+@keyframes fadeOut { to{opacity:0} }
+.confirm-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px); }
+.badge-container { position: relative; }
+.badge-upload-btn { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s; }
+.badge-upload-btn:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.6); }
+.badge-preview { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer; display: block; }
+.donut-segment { transition: opacity 0.2s; cursor: pointer; }
+.donut-segment:hover { opacity: 0.8; }
+</style>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full bg-gradient-to-br from-slate-50 via-white to-slate-50">
+  <div id="app" class="h-full w-full flex flex-col overflow-auto"><!-- Header -->
+   <header class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white px-4 py-6 sm:px-8 flex-shrink-0 border-b border-slate-700/50 shadow-xl">
+    <div class="max-w-7xl mx-auto">
+     <div class="flex items-center justify-between gap-6 mb-6"><!-- Left: Badge + School Info -->
+      <div class="flex items-center gap-6"><!-- Badge Upload -->
+       <div class="badge-container">
+        <div id="badge-display" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center border-2 border-white/40 overflow-hidden shadow-lg hover:shadow-xl transition-all cursor-pointer group" onclick="document.getElementById('badge-upload').click()" title="Klik untuk tukar lencana"><input type="file" id="badge-upload" accept="image/*" class="hidden">
+         <div id="badge-content" class="flex flex-col items-center justify-center w-full h-full p-2"><i data-lucide="shield" style="width:32px;height:32px;color:white;opacity:0.8;"></i> <span class="text-xs text-white/70 mt-1 font-medium">Upload</span>
+         </div>
+        </div>
+        <div class="absolute -bottom-1 -right-1 bg-emerald-500 rounded-full p-1.5 shadow-lg hidden" id="badge-check"><i data-lucide="check" style="width:14px;height:14px;color:white;"></i>
+        </div>
+       </div><!-- School Info -->
+       <div class="flex-1">
+        <h1 id="header-title" class="text-2xl sm:text-3xl font-800 heading text-white tracking-tight leading-tight">Sistem Guru Ganti Pro</h1>
+        <p id="header-school" class="text-slate-300 text-sm sm:text-base font-500 mt-1">SK Contoh</p><input type="text" id="school-name-edit" class="mt-3 text-sm bg-white/15 border border-white/30 rounded-lg px-3 py-2 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-white/60 w-full max-w-xs transition-all" placeholder="Edit nama sekolah...">
+       </div>
+      </div><!-- Right: Action Buttons -->
+      <div class="flex gap-2 flex-wrap justify-end"><button onclick="exportCSV()" class="btn-primary flex items-center gap-2 shadow-lg hover:shadow-xl"> <i data-lucide="download" style="width:18px;height:18px"></i> <span class="hidden sm:inline text-sm">Eksport CSV</span> </button> <button onclick="showImportModal()" class="btn-secondary flex items-center gap-2"> <i data-lucide="upload" style="width:18px;height:18px"></i> <span class="hidden sm:inline text-sm">Import</span> </button>
+      </div>
+     </div>
+    </div>
+   </header><!-- Tabs -->
+   <nav class="flex-shrink-0 bg-white border-b border-slate-200/80 px-4 sm:px-8">
+    <div class="max-w-7xl mx-auto flex gap-1 py-3 overflow-x-auto"><button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-active px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="layout-dashboard" style="width:16px;height:16px"></i> Dashboard </button> <button onclick="switchTab('entry')" id="tab-entry" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="plus-circle" style="width:16px;height:16px"></i> Rekod Baru </button> <button onclick="switchTab('teachers')" id="tab-teachers" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="users" style="width:16px;height:16px"></i> Senarai Guru </button> <button onclick="switchTab('subjects')" id="tab-subjects" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="book" style="width:16px;height:16px"></i> Subjek Guru </button> <button onclick="switchTab('schedule')" id="tab-schedule" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="calendar" style="width:16px;height:16px"></i> Jadual </button> <button onclick="switchTab('records')" id="tab-records" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="file-text" style="width:16px;height:16px"></i> Rekod </button> <button onclick="switchTab('analysis')" id="tab-analysis" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="bar-chart-3" style="width:16px;height:16px"></i> Analisis </button>
+    </div>
+   </nav><!-- Content -->
+   <main class="flex-1 px-4 sm:px-8 py-8 overflow-auto">
+    <div class="max-w-7xl mx-auto"><!-- DASHBOARD TAB -->
+     <div id="page-dashboard" class="fade-in"><!-- Stats Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+       <div class="stat-card">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-slate-600 text-sm font-500 mb-2">Jumlah Guru</p>
+          <p id="stat-teachers" class="text-3xl font-800 heading text-slate-900">0</p>
+         </div><i data-lucide="users" style="width:32px;height:32px;color:#64748b;opacity:0.3;"></i>
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-slate-600 text-sm font-500 mb-2">Jumlah Rekod</p>
+          <p id="stat-records" class="text-3xl font-800 heading text-blue-600">0</p>
+         </div><i data-lucide="file-text" style="width:32px;height:32px;color:#3b82f6;opacity:0.3;"></i>
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-slate-600 text-sm font-500 mb-2">Hari Ini</p>
+          <p id="stat-today" class="text-3xl font-800 heading text-amber-600">0</p>
+         </div><i data-lucide="calendar" style="width:32px;height:32px;color:#d97706;opacity:0.3;"></i>
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-slate-600 text-sm font-500 mb-2">Bulan Ini</p>
+          <p id="stat-month" class="text-3xl font-800 heading text-emerald-600">0</p>
+         </div><i data-lucide="trending-up" style="width:32px;height:32px;color:#10b981;opacity:0.3;"></i>
+        </div>
+       </div>
+      </div><!-- Dashboard Cards -->
+      <div class="grid sm:grid-cols-2 gap-6">
+       <div class="premium-card">
+        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+         <h3 class="font-700 heading text-slate-900 text-lg flex items-center gap-2"><i data-lucide="clock" style="width:20px;height:20px;color:#3b82f6;"></i> Rekod Terkini</h3><span class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-600">Terbaru</span>
+        </div>
+        <div id="recent-records" class="p-6 space-y-3 max-h-80 overflow-auto"></div>
+       </div>
+       <div class="premium-card">
+        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+         <h3 class="font-700 heading text-slate-900 text-lg flex items-center gap-2"><i data-lucide="star" style="width:20px;height:20px;color:#f59e0b;"></i> Guru Ganti Paling Kerap</h3><span class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-600">Top</span>
+        </div>
+        <div id="top-relief" class="p-6 space-y-3 max-h-80 overflow-auto"></div>
+       </div>
+      </div>
+     </div><!-- ENTRY TAB -->
+     <div id="page-entry" class="hidden fade-in">
+      <div class="premium-card max-w-3xl">
+       <div class="px-8 py-6 border-b border-slate-100">
+        <h3 class="font-800 heading text-slate-900 text-xl flex items-center gap-2"><i data-lucide="plus-circle" style="width:24px;height:24px;color:#0f172a;"></i> Tambah Rekod Guru Ganti</h3>
+        <p class="text-slate-500 text-sm mt-1">Isi maklumat guru ganti dengan tepat dan lengkap</p>
+       </div>
+       <form id="entry-form" class="p-8 space-y-6"><!-- Date & Day Row -->
+        <div class="grid sm:grid-cols-2 gap-6">
+         <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Tarikh</label> <input type="date" id="f-date" class="input-field w-full" required>
+         </div>
+         <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Hari</label> <input type="text" id="f-day" class="input-field w-full bg-slate-100 text-slate-600 cursor-not-allowed" readonly>
+         </div>
+        </div><!-- Teacher Selection -->
+        <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Guru Tidak Hadir</label> <select id="f-absent" class="input-field w-full" required> <option value="">-- Pilih Guru --</option> </select>
+        </div><!-- Reason -->
+        <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Sebab Tidak Hadir</label> <select id="f-reason" class="input-field w-full" required> <option value="">-- Pilih Sebab --</option> <option>Mesyuarat Luar</option> <option>Kursus</option> <option>Cuti Sakit</option> <option>Cuti Kecemasan</option> <option>Cuti Rehat</option> <option>Hal Ehwal Peribadi</option> <option>Program Sekolah</option> <option>Lain-lain</option> </select>
+        </div><!-- Period, Class, Subject Row -->
+        <div class="grid sm:grid-cols-3 gap-4">
+         <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Waktu/Slot</label> <select id="f-period" class="input-field w-full text-sm" required> <option value="">-- Pilih --</option> <option>Waktu 1</option><option>Waktu 2</option><option>Waktu 3</option><option>Waktu 4</option><option>Waktu 5</option> <option>Waktu 6</option><option>Waktu 7</option><option>Waktu 8</option><option>Waktu 9</option><option>Waktu 10</option> </select>
+         </div>
+         <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Kelas</label> <input type="text" id="f-class" class="input-field w-full text-sm" placeholder="cth: 4 Bestari" required>
+         </div>
+         <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Mata Pelajaran</label> <input type="text" id="f-subject" class="input-field w-full text-sm" placeholder="cth: Matematik" required>
+         </div>
+        </div><!-- Relief Teacher Selection -->
+        <div><label class="block text-sm font-600 text-slate-700 mb-3">Pemilihan Guru Ganti</label>
+         <div class="flex gap-3 mb-4"><button type="button" id="mode-auto-btn" onclick="switchMode('auto')" class="flex-1 py-2.5 rounded-lg text-sm font-600 transition-all flex items-center justify-center gap-2 bg-blue-100 text-blue-700 border-2 border-blue-300"> <i data-lucide="zap" style="width:16px;height:16px"></i> Auto (AI) </button> <button type="button" id="mode-manual-btn" onclick="switchMode('manual')" class="flex-1 py-2.5 rounded-lg text-sm font-600 transition-all flex items-center justify-center gap-2 bg-slate-100 text-slate-600 border-2 border-slate-200"> <i data-lucide="user" style="width:16px;height:16px"></i> Manual </button>
+         </div><!-- Auto Mode -->
+         <div id="mode-auto-panel" class="space-y-3">
+          <div id="relief-ranking" class="bg-gradient-to-br from-blue-50 to-slate-50 border border-blue-100 rounded-lg p-4 space-y-2 max-h-48 overflow-auto text-sm"></div><button type="button" onclick="autoAssignRelief()" class="btn-primary w-full flex items-center justify-center gap-2"> <i data-lucide="sparkles" style="width:16px;height:16px"></i> Pilih Yang Terbaik (Paling Kurang Tugas) </button>
+         </div><!-- Manual Mode -->
+         <div id="mode-manual-panel" class="hidden"><select id="f-relief" class="input-field w-full" required> <option value="">-- Pilih Guru Ganti --</option> </select>
+         </div>
+        </div><!-- Submit Button --> <button type="submit" id="btn-submit" class="btn-primary w-full py-3 rounded-lg font-600 flex items-center justify-center gap-2 text-base shadow-lg hover:shadow-xl"> <i data-lucide="save" style="width:18px;height:18px"></i> Simpan Rekod </button>
+       </form>
+      </div>
+     </div>
+     <div class="grid sm:grid-cols-2 gap-3">
+      <div><label class="block text-xs font-600 text-slate-600 mb-1">Tarikh</label> <input type="date" id="f-date" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" required>
+      </div>
+      <div><label class="block text-xs font-600 text-slate-600 mb-1">Hari</label> <input type="text" id="f-day" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 text-slate-500" readonly>
+      </div>
+     </div>
+     <div><label class="block text-xs font-600 text-slate-600 mb-1">Guru Tidak Hadir</label> <select id="f-absent" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" required> <option value="">-- Pilih Guru --</option> </select>
+     </div>
+     <div><label class="block text-xs font-600 text-slate-600 mb-1">Sebab</label> <select id="f-reason" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" required> <option value="">-- Pilih Sebab --</option> <option>Mesyuarat Luar</option> <option>Kursus</option> <option>Cuti Sakit</option> <option>Cuti Kecemasan</option> <option>Cuti Rehat</option> <option>Hal Ehwal Peribadi</option> <option>Program Sekolah</option> <option>Lain-lain</option> </select>
+     </div>
+     <div class="grid sm:grid-cols-3 gap-3">
+      <div><label class="block text-xs font-600 text-slate-600 mb-1">Waktu/Slot</label> <select id="f-period" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" required> <option value="">-- Pilih --</option> <option>Waktu 1</option><option>Waktu 2</option><option>Waktu 3</option> <option>Waktu 4</option><option>Waktu 5</option><option>Waktu 6</option> <option>Waktu 7</option><option>Waktu 8</option><option>Waktu 9</option><option>Waktu 10</option> </select>
+      </div>
+      <div><label class="block text-xs font-600 text-slate-600 mb-1">Kelas</label> <input type="text" id="f-class" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" placeholder="cth: 4 Bestari" required>
+      </div>
+      <div><label class="block text-xs font-600 text-slate-600 mb-1">Mata Pelajaran</label> <input type="text" id="f-subject" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" placeholder="cth: Matematik" required>
+      </div>
+     </div>
+     <div><label class="block text-xs font-600 text-slate-600 mb-2">Guru Ganti</label>
+      <div class="space-y-2">
+       <div class="flex gap-1.5 mb-2"><button type="button" id="mode-auto-btn" onclick="switchMode('auto')" class="flex-1 text-xs font-600 py-1.5 rounded-lg bg-sky-100 text-sky-700 border border-sky-300 transition">⚡ Auto (AI)</button> <button type="button" id="mode-manual-btn" onclick="switchMode('manual')" class="flex-1 text-xs font-600 py-1.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 transition">👤 Manual</button>
+       </div>
+       <div id="mode-auto-panel" class="space-y-2">
+        <div id="relief-ranking" class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2 max-h-40 overflow-auto text-sm"></div><button type="button" onclick="autoAssignRelief()" class="w-full text-xs text-white bg-sky-600 hover:bg-sky-700 font-600 py-2 rounded-lg transition">Pilih Top (Paling Kurang)</button>
+       </div>
+       <div id="mode-manual-panel" class="hidden"><select id="f-relief" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" required> <option value="">-- Pilih Guru Ganti --</option> </select>
+       </div>
+      </div>
+     </div><button type="submit" id="btn-submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-600 py-2.5 rounded-lg transition flex items-center justify-center gap-2"> <i data-lucide="plus-circle" style="width:16px;height:16px"></i> Simpan Rekod </button>
+    </div>
+   </main>
+  </div><!-- TEACHERS TAB -->
+  <div id="page-teachers" class="hidden fade-in">
+   <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm max-w-2xl mb-4">
+    <h3 class="font-700 text-slate-800 mb-3">Tambah Guru</h3>
+    <div class="flex gap-2"><input type="text" id="new-teacher" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none text-sm" placeholder="Nama guru..."> <button onclick="addTeacher()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-600 transition">Tambah</button>
+    </div>
+    <div class="mt-3 flex gap-2"><button onclick="showCSVTeacherModal()" class="text-xs text-sky-600 hover:text-sky-800 font-600 flex items-center gap-1"><i data-lucide="upload" style="width:12px;height:12px"></i> Import CSV</button> <button onclick="downloadTeacherTemplate()" class="text-xs text-emerald-600 hover:text-emerald-800 font-600 flex items-center gap-1"><i data-lucide="download" style="width:12px;height:12px"></i> Template CSV</button>
+    </div>
+   </div>
+   <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm max-w-2xl">
+    <h3 class="font-700 text-slate-800 mb-3">Senarai Guru (<span id="teacher-count">0</span>)</h3>
+    <div id="teacher-list" class="space-y-1 max-h-96 overflow-auto"></div>
+   </div>
+  </div><!-- SUBJECTS TAB -->
+  <div id="page-subjects" class="hidden fade-in">
+   <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm max-w-2xl mb-4">
+    <h3 class="font-700 text-slate-800 mb-4">Set Subjek Mengajar Guru</h3>
+    <div class="space-y-3">
+     <div><label class="block text-xs font-600 text-slate-600 mb-1">Pilih Guru</label> <select id="subject-teacher" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none text-sm" onchange="loadTeacherSubjects()"> <option value="">-- Pilih Guru --</option> </select>
+     </div>
+     <div><label class="block text-xs font-600 text-slate-600 mb-2">Subjek Mengajar (dipisahkan koma)</label> <textarea id="subject-input" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none text-sm" rows="3" placeholder="Contoh: Matematik, Sains, Bahasa Inggeris"></textarea>
+      <div class="text-xs text-slate-400 mt-1">
+       Masukkan semua subjek yang guru ajar, dipisahkan koma
+      </div>
+     </div><button onclick="saveTeacherSubjects()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-600 py-2 rounded-lg transition text-sm">Simpan Subjek</button>
+    </div>
+   </div>
+   <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm max-w-2xl">
+    <h3 class="font-700 text-slate-800 mb-4">Subjek Guru Terkini</h3>
+    <div id="subject-list" class="space-y-2 max-h-96 overflow-auto text-sm"></div>
+   </div>
+  </div><!-- SCHEDULE TAB -->
+  <div id="page-schedule" class="hidden fade-in">
+   <div class="grid sm:grid-cols-2 gap-4">
+    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+     <h3 class="font-700 text-slate-800 mb-4">Set Jadual Guru</h3>
+     <div class="space-y-3">
+      <div><label class="block text-xs font-600 text-slate-600 mb-1">Pilih Guru</label> <select id="schedule-teacher" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none text-sm" onchange="renderScheduleGrid()"> <option value="">-- Pilih Guru --</option> </select>
+      </div>
+      <div class="text-xs text-slate-500 mb-2">
+       Jadual Mingguan (tandakan waktu mengajar setiap hari)
+      </div>
+      <div id="schedule-grid" class="bg-slate-50 rounded-lg p-3 border border-slate-200 overflow-x-auto"></div><button onclick="saveTeacherSchedule()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-600 py-2 rounded-lg transition text-sm">Simpan Jadual</button>
+     </div>
+    </div>
+    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+     <h3 class="font-700 text-slate-800 mb-4">Jadual Terkini</h3>
+     <div id="schedule-list" class="space-y-2 max-h-96 overflow-auto text-sm"></div>
+    </div>
+   </div>
+  </div><!-- RECORDS TAB -->
+  <div id="page-records" class="hidden fade-in">
+   <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="p-4 border-b border-slate-200 flex flex-wrap gap-2 items-center"><input type="text" id="search-records" oninput="renderRecords()" placeholder="Cari..." class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-sky-300 outline-none"> <select id="filter-month" onchange="renderRecords()" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm"> <option value="">Semua Bulan</option> <option value="01">Januari</option><option value="02">Februari</option><option value="03">Mac</option> <option value="04">April</option><option value="05">Mei</option><option value="06">Jun</option> <option value="07">Julai</option><option value="08">Ogos</option><option value="09">September</option> <option value="10">Oktober</option><option value="11">November</option><option value="12">Disember</option> </select>
+    </div>
+    <div class="overflow-x-auto">
+     <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-600 text-xs">
+       <tr>
+        <th class="text-left px-4 py-2 font-600">#</th>
+        <th class="text-left px-4 py-2 font-600">Tarikh</th>
+        <th class="text-left px-4 py-2 font-600">Hari</th>
+        <th class="text-left px-4 py-2 font-600">Guru Tidak Hadir</th>
+        <th class="text-left px-4 py-2 font-600">Sebab</th>
+        <th class="text-left px-4 py-2 font-600">Waktu</th>
+        <th class="text-left px-4 py-2 font-600">Kelas</th>
+        <th class="text-left px-4 py-2 font-600">Subjek</th>
+        <th class="text-left px-4 py-2 font-600">Guru Ganti</th>
+        <th class="text-left px-4 py-2 font-600"></th>
+       </tr>
+      </thead>
+      <tbody id="records-table" class="divide-y divide-slate-100"></tbody>
+     </table>
+    </div>
+    <div id="no-records" class="hidden p-8 text-center text-slate-400 text-sm">
+     Tiada rekod dijumpai
+    </div>
+   </div>
+  </div><!-- ANALYSIS TAB -->
+  <div id="page-analysis" class="hidden fade-in">
+   <div class="grid sm:grid-cols-2 gap-4 mb-4">
+    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+     <h3 class="font-700 text-slate-800 mb-4 text-sm">Sebab Tidak Hadir</h3>
+     <div class="flex items-center justify-center">
+      <svg id="donut-chart" viewbox="0 0 200 200" width="200" height="200"></svg>
+     </div>
+     <div id="donut-legend" class="mt-4 space-y-1 text-xs"></div>
+    </div>
+    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+     <h3 class="font-700 text-slate-800 mb-4 text-sm">Kekerapan Guru Tidak Hadir</h3>
+     <div id="absent-freq" class="space-y-2 max-h-72 overflow-auto"></div>
+    </div>
+   </div>
+   <div class="grid sm:grid-cols-2 gap-4">
+    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+     <h3 class="font-700 text-slate-800 mb-4 text-sm">Kekerapan Guru Ganti</h3>
+     <div id="relief-freq" class="space-y-2 max-h-72 overflow-auto"></div>
+    </div>
+    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+     <h3 class="font-700 text-slate-800 mb-4 text-sm">Analisis Bulanan</h3>
+     <div id="monthly-analysis" class="space-y-2 max-h-72 overflow-auto"></div>
+    </div>
+   </div>
+  </div> <!-- Import Modal -->
+  <div id="import-modal" class="confirm-overlay hidden">
+   <div class="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
+    <h3 class="font-700 text-slate-800 mb-2">Import CSV Rekod</h3>
+    <p class="text-xs text-slate-500 mb-3">Format: tarikh,guru_tidak_hadir,sebab,waktu,kelas,subjek,guru_ganti</p><textarea id="import-csv-text" rows="6" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-sky-300 outline-none" placeholder="2024-01-15,Ali,Kursus,Waktu 1,4 Bestari,Matematik,Abu"></textarea>
+    <div class="flex gap-2 mt-3"><button onclick="processImportCSV()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white py-2 rounded-lg text-sm font-600 transition">Import</button> <button onclick="hideModal('import-modal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-sm font-600 transition">Batal</button>
+    </div>
+   </div>
+  </div><!-- CSV Teacher Modal -->
+  <div id="csv-teacher-modal" class="confirm-overlay hidden">
+   <div class="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
+    <h3 class="font-700 text-slate-800 mb-2">Import Senarai Guru (CSV)</h3>
+    <p class="text-xs text-slate-500 mb-3">Satu nama setiap baris, atau dipisahkan koma</p><textarea id="csv-teacher-text" rows="6" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-sky-300 outline-none" placeholder="Ali bin Abu
+Siti binti Ahmad
+Ahmad bin Hassan"></textarea>
+    <div class="flex gap-2 mt-3"><button onclick="processCSVTeachers()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white py-2 rounded-lg text-sm font-600 transition">Import</button> <button onclick="hideModal('csv-teacher-modal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-sm font-600 transition">Batal</button>
+    </div>
+   </div>
+  </div><!-- Delete Confirm -->
+  <div id="delete-confirm" class="confirm-overlay hidden">
+   <div class="bg-white rounded-xl p-6 shadow-xl max-w-sm w-full mx-4 text-center">
+    <p class="text-slate-800 font-600 mb-4">Padam rekod ini?</p>
+    <div class="flex gap-2"><button id="confirm-delete-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg text-sm font-600 transition">Padam</button> <button onclick="hideModal('delete-confirm')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-sm font-600 transition">Batal</button>
+    </div>
+   </div>
+  </div>
+  <script>
+// ========== STATE ==========
+let allRecords = [];
+let teachers = JSON.parse(localStorage.getItem('sgg_teachers') || '[]');
+let teacherSchedules = JSON.parse(localStorage.getItem('sgg_schedules') || '{}');
+let teacherSubjects = JSON.parse(localStorage.getItem('sgg_subjects') || '{}');
+let currentTab = 'dashboard';
+let pendingDeleteRecord = null;
+let currentScheduleTeacher = null;
+let badgeImage = localStorage.getItem('sgg_badge') || null;
+
+const DAYS_MS = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+const REASON_COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316'];
+
+const defaultConfig = {
+  app_title: 'Sistem Guru Ganti',
+  school_name: 'SK Contoh',
+  bg_color: '#f8fafc',
+  header_color: '#1e293b',
+  text_color: '#334155',
+  accent_color: '#0ea5e9',
+  card_color: '#ffffff'
+};
+
+// ========== ELEMENT SDK ==========
+window.elementSdk.init({
+  defaultConfig,
+  onConfigChange: async (config) => {
+    const t = config.app_title || defaultConfig.app_title;
+    const s = config.school_name || defaultConfig.school_name;
+    const bg = config.bg_color || defaultConfig.bg_color;
+    const hdr = config.header_color || defaultConfig.header_color;
+    const txt = config.text_color || defaultConfig.text_color;
+    const acc = config.accent_color || defaultConfig.accent_color;
+    const card = config.card_color || defaultConfig.card_color;
+
+    document.getElementById('header-title').textContent = '📋 ' + t;
+    document.getElementById('header-school').textContent = s;
+    document.body.style.backgroundColor = bg;
+    document.querySelector('header').style.background = `linear-gradient(to right, ${hdr}, ${hdr}dd)`;
+
+    document.querySelectorAll('h3, th, .font-700, .font-800').forEach(el => {
+      if (!el.closest('header')) el.style.color = txt;
+    });
+    document.querySelectorAll('.bg-white').forEach(el => el.style.backgroundColor = card);
+    document.querySelectorAll('.bg-slate-800').forEach(el => {
+      if (!el.closest('header')) { el.style.backgroundColor = acc; }
+    });
+
+    const font = config.font_family || defaultConfig.font_family || 'Plus Jakarta Sans';
+    document.body.style.fontFamily = `${font}, Plus Jakarta Sans, sans-serif`;
+
+    if (config.font_size) {
+      const base = config.font_size;
+      document.querySelectorAll('h1').forEach(e => e.style.fontSize = base*1.5+'px');
+      document.querySelectorAll('h3').forEach(e => e.style.fontSize = base*0.9+'px');
+      document.querySelectorAll('p,td,th,label,option,button,input,select').forEach(e => e.style.fontSize = base*0.85+'px');
+    }
+  },
+  mapToCapabilities: (config) => ({
+    recolorables: [
+      { get: () => config.bg_color || defaultConfig.bg_color, set: v => { config.bg_color = v; window.elementSdk.setConfig({bg_color:v}); }},
+      { get: () => config.card_color || defaultConfig.card_color, set: v => { config.card_color = v; window.elementSdk.setConfig({card_color:v}); }},
+      { get: () => config.text_color || defaultConfig.text_color, set: v => { config.text_color = v; window.elementSdk.setConfig({text_color:v}); }},
+      { get: () => config.header_color || defaultConfig.header_color, set: v => { config.header_color = v; window.elementSdk.setConfig({header_color:v}); }},
+      { get: () => config.accent_color || defaultConfig.accent_color, set: v => { config.accent_color = v; window.elementSdk.setConfig({accent_color:v}); }}
+    ],
+    borderables: [],
+    fontEditable: {
+      get: () => config.font_family || 'Plus Jakarta Sans',
+      set: v => { config.font_family = v; window.elementSdk.setConfig({font_family:v}); }
+    },
+    fontSizeable: {
+      get: () => config.font_size || 16,
+      set: v => { config.font_size = v; window.elementSdk.setConfig({font_size:v}); }
+    }
+  }),
+  mapToEditPanelValues: (config) => new Map([
+    ['app_title', config.app_title || defaultConfig.app_title],
+    ['school_name', config.school_name || defaultConfig.school_name]
+  ])
+});
+
+// ========== DATA SDK ==========
+const dataHandler = {
+  onDataChanged(data) {
+    const recs = data.filter(d => d.type === 'record');
+    const tchs = data.filter(d => d.type === 'teacher');
+
+    allRecords = recs.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+    // Sync teachers from data SDK
+    const teacherNames = tchs.map(t => t.absent_teacher).filter(Boolean);
+    if (teacherNames.length > 0 || teachers.length === 0) {
+      teachers = [...new Set([...teacherNames, ...teachers])];
+      localStorage.setItem('sgg_teachers', JSON.stringify(teachers));
+    }
+
+    refreshAll();
+  }
+};
+
+(async () => {
+  const r = await window.dataSdk.init(dataHandler);
+  if (!r.isOk) console.error('Data SDK init failed');
+})();
+
+// ========== HELPERS ==========
+function toast(msg, color='#10b981') {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.background = color;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
+function showImportModal() { document.getElementById('import-modal').classList.remove('hidden'); }
+function showCSVTeacherModal() { document.getElementById('csv-teacher-modal').classList.remove('hidden'); }
+
+function getDayName(dateStr) {
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? '' : DAYS_MS[d.getDay()];
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  ['dashboard','entry','teachers','subjects','schedule','records','analysis'].forEach(t => {
+    document.getElementById('page-'+t).classList.toggle('hidden', t !== tab);
+    const btn = document.getElementById('tab-'+t);
+    btn.className = t === tab ? 'tab-active px-4 py-2 rounded-lg text-sm font-600 whitespace-nowrap transition-all' : 'tab-inactive px-4 py-2 rounded-lg text-sm font-600 whitespace-nowrap transition-all';
+  });
+  if (tab === 'analysis') renderAnalysis();
+  if (tab === 'schedule') renderSchedulePage();
+  if (tab === 'subjects') renderSubjectsPage();
+}
+
+// ========== AUTO DATE ==========
+document.getElementById('f-date').addEventListener('change', function() {
+  document.getElementById('f-day').value = getDayName(this.value);
+});
+document.getElementById('f-date').valueAsDate = new Date();
+document.getElementById('f-day').value = getDayName(new Date().toISOString().slice(0,10));
+
+// ========== TEACHERS ==========
+function saveTeachersToSDK(name) {
+  return window.dataSdk.create({ type: 'teacher', absent_teacher: name, date:'', day:'', reason:'', period:'', class_name:'', subject:'', relief_teacher:'', created_at: new Date().toISOString() });
+}
+
+async function addTeacher() {
+  const inp = document.getElementById('new-teacher');
+  const name = inp.value.trim();
+  if (!name) return;
+  if (teachers.includes(name)) { toast('Guru sudah wujud','#f59e0b'); return; }
+  teachers.push(name);
+  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));
+  await saveTeachersToSDK(name);
+  inp.value = '';
+  refreshAll();
+  toast('Guru ditambah!');
+}
+
+async function removeTeacher(name) {
+  teachers = teachers.filter(t => t !== name);
+  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));
+  refreshAll();
+  toast('Guru dipadam','#ef4444');
+}
+
+async function processCSVTeachers() {
+  const text = document.getElementById('csv-teacher-text').value.trim();
+  if (!text) { toast('Sila masukkan nama guru','#f59e0b'); return; }
+  
+  // Support both: baris baru ATAU koma
+  let names = [];
+  
+  // Try comma-separated
+  if (text.includes(',')) {
+    names = text.split(',').map(s => s.trim()).filter(Boolean);
+  } else {
+    // Try newline-separated
+    names = text.split('\n').map(s => s.trim()).filter(Boolean);
+  }
+  
+  if (names.length === 0) { toast('Format tidak sah','#f59e0b'); return; }
+  
+  let added = 0;
+  for (const n of names) {
+    if (!teachers.includes(n)) {
+      teachers.push(n);
+      if (allRecords.length + teachers.length < 999) await saveTeachersToSDK(n);
+      added++;
+    }
+  }
+  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));
+  hideModal('csv-teacher-modal');
+  refreshAll();
+  
+  const msg = added === 0 ? 'Semua guru sudah wujud' : `${added} guru ditambah!`;
+  toast(msg, added === 0 ? '#f59e0b' : '#10b981');
+}
+
+function downloadTeacherTemplate() {
+  const template = 'Ali bin Abu\nSiti binti Ahmad\nAhmad bin Hassan\n';
+  const blob = new Blob([template], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'senarai_guru_template.txt';
+  a.click();
+  toast('Template dimuat turun!');
+}
+
+// ========== MODE SWITCHING ==========
+let currentMode = 'auto';
+
+function switchMode(mode) {
+  currentMode = mode;
+  const autoPanelBtn = document.getElementById('mode-auto-btn');
+  const manualPanelBtn = document.getElementById('mode-manual-btn');
+  const autoPanel = document.getElementById('mode-auto-panel');
+  const manualPanel = document.getElementById('mode-manual-panel');
+  const reliefSel = document.getElementById('f-relief');
+
+  if (mode === 'auto') {
+    autoPanelBtn.className = 'flex-1 text-xs font-600 py-1.5 rounded-lg bg-sky-100 text-sky-700 border border-sky-300 transition';
+    manualPanelBtn.className = 'flex-1 text-xs font-600 py-1.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 transition';
+    autoPanel.classList.remove('hidden');
+    manualPanel.classList.add('hidden');
+    reliefSel.removeAttribute('required');
+    renderReliefsRanking();
+  } else {
+    autoPanelBtn.className = 'flex-1 text-xs font-600 py-1.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 transition';
+    manualPanelBtn.className = 'flex-1 text-xs font-600 py-1.5 rounded-lg bg-sky-100 text-sky-700 border border-sky-300 transition';
+    autoPanel.classList.add('hidden');
+    manualPanel.classList.remove('hidden');
+    reliefSel.setAttribute('required', 'true');
+    reliefSel.value = '';
+  }
+}
+
+// ========== RENDER RELIEF RANKING ==========
+function renderReliefsRanking() {
+  const absent = document.getElementById('f-absent').value;
+  const date = document.getElementById('f-date').value;
+  const period = document.getElementById('f-period').value;
+  const container = document.getElementById('relief-ranking');
+
+  if (!absent || !date || !period) {
+    container.innerHTML = '<p class="text-slate-400 text-xs">Pilih guru tidak hadir, tarikh & waktu dahulu</p>';
+    return;
+  }
+
+  // Get candidates with full logic
+  const candidates = getAvailableCandidates(absent, date, period);
+
+  if (candidates.length === 0) {
+    container.innerHTML = '<p class="text-slate-400 text-xs">❌ Tiada guru tersedia</p>';
+    return;
+  }
+
+  // Rank candidates
+  const rankData = candidates.map(name => {
+    const reliefCountToday = allRecords.filter(r => r.date === date && r.relief_teacher === name).length;
+    const reliefCountTotal = allRecords.filter(r => r.relief_teacher === name).length;
+    return { name, reliefCountToday, reliefCountTotal };
+  });
+
+  rankData.sort((a, b) => {
+    if (a.reliefCountToday !== b.reliefCountToday) return a.reliefCountToday - b.reliefCountToday;
+    return a.reliefCountTotal - b.reliefCountTotal;
+  });
+
+  // Render ranking
+  container.innerHTML = rankData.map((r, idx) => {
+    const isTop = idx === 0;
+    return `<div class="flex items-center gap-2 p-2 rounded-lg ${isTop ? 'bg-sky-50 border border-sky-200' : 'bg-white border border-slate-100'} cursor-pointer hover:bg-sky-50 transition" onclick="selectReliefFromRanking('${r.name}')">
+      <div class="text-xs font-800 ${isTop ? 'text-sky-600' : 'text-slate-400'}">#${idx + 1}</div>
+      <div class="flex-1">
+        <div class="text-xs font-600 text-slate-800">${r.name}</div>
+        <div class="text-xs text-slate-500">Hari ini: ${r.reliefCountToday}x | Jumlah: ${r.reliefCountTotal}x</div>
+      </div>
+      ${isTop ? '<span class="text-lg">⭐</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function selectReliefFromRanking(name) {
+  document.getElementById('f-relief').value = name;
+  toast(`✓ ${name} dipilih`, '#10b981');
+}
+
+// ========== GET AVAILABLE CANDIDATES ==========
+function getAvailableCandidates(absent, date, period) {
+  // Count relief frequency
+  const freq = {};
+  teachers.forEach(t => freq[t] = 0);
+  allRecords.forEach(r => { if (r.relief_teacher) freq[r.relief_teacher] = (freq[r.relief_teacher]||0) + 1; });
+
+  // Count relief on same DAY
+  const frequencyOnDay = {};
+  teachers.forEach(t => frequencyOnDay[t] = 0);
+  allRecords.filter(r => r.date === date).forEach(r => {
+    if (r.relief_teacher) frequencyOnDay[r.relief_teacher] = (frequencyOnDay[r.relief_teacher]||0) + 1;
+  });
+
+  // Check who's already relieving on same date+period
+  const busyOnSlot = new Set(allRecords.filter(r => r.date === date && r.period === period).map(r => r.relief_teacher));
+  // Check who's absent on same date
+  const absentOnDate = new Set(allRecords.filter(r => r.date === date).map(r => r.absent_teacher));
+  // Check who has teaching duties on this period
+  const teachingOnPeriod = new Set();
+  teachers.forEach(t => {
+    const scheduleJson = teacherSchedules[t];
+    if (scheduleJson) {
+      const schedule = JSON.parse(scheduleJson);
+      const periods = ['Waktu 1', 'Waktu 2', 'Waktu 3', 'Waktu 4', 'Waktu 5', 'Waktu 6', 'Waktu 7', 'Waktu 8'];
+      const periodIdx = periods.indexOf(period);
+      
+      // Get day index from date
+      const d = new Date(date);
+      const dayIdx = (d.getDay() + 6) % 7; // Monday = 0, Sunday = 6
+      
+      const key = `${dayIdx}-${periodIdx}`;
+      if (schedule[key]) teachingOnPeriod.add(t);
+    }
+  });
+
+  const candidates = teachers.filter(t => 
+    t !== absent && 
+    !busyOnSlot.has(t) && 
+    !absentOnDate.has(t) &&
+    !teachingOnPeriod.has(t) &&
+    frequencyOnDay[t] < 3  // Max 3 reliefs per day per teacher
+  );
+
+  return candidates;
+}
+
+// ========== AI AUTO ASSIGN ==========
+function autoAssignRelief() {
+  const absent = document.getElementById('f-absent').value;
+  const date = document.getElementById('f-date').value;
+  const period = document.getElementById('f-period').value;
+
+  if (!absent || !date || !period) {
+    toast('Pilih guru tidak hadir, tarikh & waktu','#f59e0b');
+    return;
+  }
+
+  const candidates = getAvailableCandidates(absent, date, period);
+
+  if (candidates.length === 0) {
+    toast('❌ Tiada guru tersedia pada waktu ini','#ef4444');
+    return;
+  }
+
+  // Rank and pick top
+  const freq = {};
+  teachers.forEach(t => freq[t] = 0);
+  allRecords.forEach(r => { if (r.relief_teacher) freq[r.relief_teacher] = (freq[r.relief_teacher]||0) + 1; });
+
+  const frequencyOnDay = {};
+  teachers.forEach(t => frequencyOnDay[t] = 0);
+  allRecords.filter(r => r.date === date).forEach(r => {
+    if (r.relief_teacher) frequencyOnDay[r.relief_teacher] = (frequencyOnDay[r.relief_teacher]||0) + 1;
+  });
+
+  candidates.sort((a,b) => {
+    const dayDiff = frequencyOnDay[a] - frequencyOnDay[b];
+    if (dayDiff !== 0) return dayDiff;
+    return (freq[a]||0) - (freq[b]||0);
+  });
+
+  const chosen = candidates[0];
+  document.getElementById('f-relief').value = chosen;
+  const dayCount = frequencyOnDay[chosen] || 0;
+  toast(`✓ ${chosen} dipilih otomatis (hari ini: ${dayCount}x)`, '#3b82f6');
+}
+
+// ========== ENTRY FORM ==========
+document.getElementById('entry-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  if (allRecords.length >= 999) { toast('Had 999 rekod dicapai!','#ef4444'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Menyimpan...';
+
+  // For manual mode, validate relief is selected
+  if (currentMode === 'manual') {
+    const relief = document.getElementById('f-relief').value;
+    if (!relief) {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="plus-circle" style="width:16px;height:16px"></i> Simpan Rekod';
+      lucide.createIcons();
+      toast('Sila pilih guru ganti','#f59e0b');
+      return;
+    }
+  }
+
+  const record = {
+    type: 'record',
+    date: document.getElementById('f-date').value,
+    day: document.getElementById('f-day').value,
+    absent_teacher: document.getElementById('f-absent').value,
+    reason: document.getElementById('f-reason').value,
+    period: document.getElementById('f-period').value,
+    class_name: document.getElementById('f-class').value,
+    subject: document.getElementById('f-subject').value,
+    relief_teacher: document.getElementById('f-relief').value,
+    created_at: new Date().toISOString(),
+    relief_mode: currentMode
+  };
+
+  const result = await window.dataSdk.create(record);
+  btn.disabled = false;
+  btn.innerHTML = '<i data-lucide="plus-circle" style="width:16px;height:16px"></i> Simpan Rekod';
+  lucide.createIcons();
+
+  if (result.isOk) {
+    toast('✓ Rekod disimpan & backup dimuat turun!');
+    document.getElementById('f-class').value = '';
+    document.getElementById('f-subject').value = '';
+    // Auto-backup ke Downloads folder
+    setTimeout(() => autoBackupCSV(), 300);
+  } else {
+    toast('Gagal menyimpan','#ef4444');
+  }
+});
+
+// ========== ON DATE/ABSENT CHANGE - UPDATE RANKING ==========
+document.getElementById('f-date').addEventListener('change', () => {
+  if (currentMode === 'auto') renderReliefsRanking();
+});
+document.getElementById('f-absent').addEventListener('change', () => {
+  if (currentMode === 'auto') renderReliefsRanking();
+});
+document.getElementById('f-period').addEventListener('change', () => {
+  if (currentMode === 'auto') renderReliefsRanking();
+});
+
+// ========== DELETE ==========
+function confirmDelete(rec) {
+  pendingDeleteRecord = rec;
+  document.getElementById('delete-confirm').classList.remove('hidden');
+  document.getElementById('confirm-delete-btn').onclick = async () => {
+    hideModal('delete-confirm');
+    const r = await window.dataSdk.delete(pendingDeleteRecord);
+    if (r.isOk) toast('Rekod dipadam','#ef4444');
+    else toast('Gagal memadam','#ef4444');
+  };
+}
+
+// ========== SCHEDULE ==========
+function renderSchedulePage() {
+  const sel = document.getElementById('schedule-teacher');
+  const sorted = [...teachers].sort();
+  const val = sel.value;
+  sel.innerHTML = '<option value="">-- Pilih Guru --</option>';
+  sorted.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t;
+    o.textContent = t;
+    sel.appendChild(o);
+  });
+  sel.value = val;
+
+  renderScheduleGrid();
+  renderScheduleList();
+}
+
+function renderScheduleGrid() {
+  const teacher = document.getElementById('schedule-teacher').value;
+  const container = document.getElementById('schedule-grid');
+
+  if (!teacher) {
+    container.innerHTML = '<p class="text-slate-400 text-xs">Sila pilih guru dahulu</p>';
+    return;
+  }
+
+  // Get saved schedule for this teacher
+  const schedule = teacherSchedules[teacher] ? JSON.parse(teacherSchedules[teacher]) : {};
+  
+  const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu', 'Ahad'];
+  const periods = ['Waktu 1', 'Waktu 2', 'Waktu 3', 'Waktu 4', 'Waktu 5', 'Waktu 6', 'Waktu 7', 'Waktu 8', 'Waktu 9', 'Waktu 10'];
+
+  // Build HTML grid
+  let html = '<div class="overflow-x-auto">';
+  html += '<table class="w-full text-xs border-collapse">';
+  
+  // Header row - days
+  html += '<tr><th class="border border-slate-300 bg-slate-200 px-2 py-1.5 font-600 text-center w-12">Waktu</th>';
+  days.forEach(day => {
+    html += `<th class="border border-slate-300 bg-sky-100 px-2 py-1.5 font-600 text-center w-16">${day}</th>`;
+  });
+  html += '</tr>';
+
+  // Data rows - time slots
+  periods.forEach((period, pIdx) => {
+    html += `<tr><td class="border border-slate-300 bg-slate-100 px-2 py-1.5 font-600 text-center text-xs">${period}</td>`;
+    days.forEach((day, dIdx) => {
+      const key = `${dIdx}-${pIdx}`;
+      const isChecked = schedule[key];
+      html += `<td class="border border-slate-300 px-1.5 py-1 text-center">
+        <input type="checkbox" class="schedule-grid-checkbox" data-key="${key}" ${isChecked ? 'checked' : ''} style="width:18px;height:18px;cursor:pointer;">
+      </td>`;
+    });
+    html += '</tr>';
+  });
+
+  html += '</table></div>';
+  container.innerHTML = html;
+}
+
+function saveTeacherSchedule() {
+  const teacher = document.getElementById('schedule-teacher').value;
+  if (!teacher) {
+    toast('Sila pilih guru','#f59e0b');
+    return;
+  }
+
+  const checked = {};
+  document.querySelectorAll('.schedule-grid-checkbox:checked').forEach(c => {
+    checked[c.dataset.key] = true;
+  });
+
+  teacherSchedules[teacher] = JSON.stringify(checked);
+  localStorage.setItem('sgg_schedules', JSON.stringify(teacherSchedules));
+
+  renderScheduleList();
+  toast(`Jadual mingguan ${teacher} disimpan!`);
+}
+
+function renderScheduleList() {
+  const container = document.getElementById('schedule-list');
+  const sorted = Object.entries(teacherSchedules).sort((a,b) => a[0].localeCompare(b[0]));
+
+  if (sorted.length === 0) {
+    container.innerHTML = '<p class="text-slate-400">Belum ada jadual guru</p>';
+    return;
+  }
+
+  const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu', 'Ahad'];
+
+  container.innerHTML = sorted.map(([teacher, scheduleJson]) => {
+    const schedule = JSON.parse(scheduleJson);
+    const periods = ['Waktu 1', 'Waktu 2', 'Waktu 3', 'Waktu 4', 'Waktu 5', 'Waktu 6', 'Waktu 7', 'Waktu 8'];
+    
+    // Build summary
+    let summary = {};
+    days.forEach(day => summary[day] = []);
+    
+    Object.entries(schedule).forEach(([key, val]) => {
+      if (val) {
+        const [dayIdx, periodIdx] = key.split('-').map(Number);
+        summary[days[dayIdx]].push(periods[periodIdx]);
+      }
+    });
+
+    const hasData = Object.values(summary).some(arr => arr.length > 0);
+    
+    return `<div class="bg-slate-50 rounded-lg p-3 border border-slate-200 mb-2">
+      <div class="flex items-start justify-between mb-2">
+        <span class="font-600 text-slate-800">${teacher}</span>
+        <button onclick="deleteSchedule('${teacher.replace(/'/g,"\\'")}')" class="text-red-400 hover:text-red-600 text-xs">Batal</button>
+      </div>
+      ${hasData ? `<div class="text-xs text-slate-600 space-y-1">
+        ${days.map(day => {
+          const slots = summary[day];
+          return slots.length > 0 ? `<div><span class="font-500">${day}:</span> ${slots.join(', ')}</div>` : '';
+        }).join('')}
+      </div>` : '<div class="text-xs text-slate-400 italic">Tiada slot mengajar ditetapkan</div>'}
+    </div>`;
+  }).join('');
+}
+
+function deleteSchedule(teacher) {
+  delete teacherSchedules[teacher];
+  localStorage.setItem('sgg_schedules', JSON.stringify(teacherSchedules));
+  renderScheduleList();
+  toast('Jadual dipadam','#ef4444');
+}
+
+// ========== SUBJECTS ==========
+function renderSubjectsPage() {
+  const sel = document.getElementById('subject-teacher');
+  const sorted = [...teachers].sort();
+  const val = sel.value;
+  sel.innerHTML = '<option value="">-- Pilih Guru --</option>';
+  sorted.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t;
+    o.textContent = t;
+    sel.appendChild(o);
+  });
+  sel.value = val;
+
+  renderSubjectList();
+  loadTeacherSubjects();
+}
+
+function loadTeacherSubjects() {
+  const teacher = document.getElementById('subject-teacher').value;
+  const textarea = document.getElementById('subject-input');
+  if (!teacher) {
+    textarea.value = '';
+  } else {
+    const subjects = teacherSubjects[teacher] || '';
+    textarea.value = subjects;
+  }
+}
+
+function saveTeacherSubjects() {
+  const teacher = document.getElementById('subject-teacher').value;
+  const subjects = document.getElementById('subject-input').value.trim();
+  if (!teacher) {
+    toast('Sila pilih guru','#f59e0b');
+    return;
+  }
+  teacherSubjects[teacher] = subjects;
+  localStorage.setItem('sgg_subjects', JSON.stringify(teacherSubjects));
+  renderSubjectList();
+  toast(`Subjek ${teacher} disimpan!`);
+}
+
+function renderSubjectList() {
+  const container = document.getElementById('subject-list');
+  const sorted = Object.entries(teacherSubjects).sort((a,b) => a[0].localeCompare(b[0]));
+
+  if (sorted.length === 0) {
+    container.innerHTML = '<p class="text-slate-400">Belum ada data subjek guru</p>';
+    return;
+  }
+
+  container.innerHTML = sorted.map(([teacher, subjects]) => {
+    const subjectsList = subjects.split(',').map(s => s.trim()).filter(Boolean);
+    return `<div class="bg-slate-50 rounded-lg p-3 border border-slate-200 mb-2">
+      <div class="flex items-start justify-between mb-2">
+        <span class="font-600 text-slate-800">${teacher}</span>
+        <button onclick="deleteSubjects('${teacher.replace(/'/g,"\\'")}')" class="text-red-400 hover:text-red-600 text-xs">Batal</button>
+      </div>
+      ${subjectsList.length > 0 ? `<div class="text-xs text-slate-600">
+        <span class="inline-flex flex-wrap gap-1">
+          ${subjectsList.map(s => `<span class="bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">${s}</span>`).join('')}
+        </span>
+      </div>` : '<div class="text-xs text-slate-400 italic">Tiada subjek ditetapkan</div>'}
+    </div>`;
+  }).join('');
+}
+
+function deleteSubjects(teacher) {
+  delete teacherSubjects[teacher];
+  localStorage.setItem('sgg_subjects', JSON.stringify(teacherSubjects));
+  renderSubjectList();
+  toast('Subjek dipadam','#ef4444');
+}
+
+// ========== RENDER ==========
+function refreshAll() {
+  renderTeacherDropdowns();
+  renderTeacherList();
+  renderDashboard();
+  renderRecords();
+  if (currentTab === 'analysis') renderAnalysis();
+  if (currentTab === 'schedule') renderSchedulePage();
+}
+
+function renderTeacherDropdowns() {
+  const sorted = [...teachers].sort();
+  ['f-absent','f-relief'].forEach(id => {
+    const sel = document.getElementById(id);
+    const val = sel.value;
+    const opts = sel.querySelectorAll('option:not(:first-child)');
+    opts.forEach(o => o.remove());
+    sorted.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t; o.textContent = t;
+      sel.appendChild(o);
+    });
+    sel.value = val;
+  });
+}
+
+function renderTeacherList() {
+  const el = document.getElementById('teacher-list');
+  const cnt = document.getElementById('teacher-count');
+  cnt.textContent = teachers.length;
+  if (teachers.length === 0) { el.innerHTML = '<p class="text-slate-400 text-sm">Tiada guru. Sila tambah guru.</p>'; return; }
+  el.innerHTML = [...teachers].sort().map(t =>
+    `<div class="flex items-center justify-between py-1.5 px-2 rounded hover:bg-slate-50">
+      <span class="text-sm text-slate-700">${t}</span>
+      <button onclick="removeTeacher('${t.replace(/'/g,"\\'")}')" class="text-red-400 hover:text-red-600 text-xs">Padam</button>
+    </div>`
+  ).join('');
+}
+
+function renderDashboard() {
+  const today = new Date().toISOString().slice(0,10);
+  const month = today.slice(0,7);
+  document.getElementById('stat-teachers').textContent = teachers.length;
+  document.getElementById('stat-records').textContent = allRecords.length;
+  document.getElementById('stat-today').textContent = allRecords.filter(r => r.date === today).length;
+  document.getElementById('stat-month').textContent = allRecords.filter(r => (r.date||'').startsWith(month)).length;
+
+  // Recent records
+  const recent = document.getElementById('recent-records');
+  const last5 = allRecords.slice(0,5);
+  if (last5.length === 0) { recent.innerHTML = '<p class="text-slate-400">Tiada rekod</p>'; }
+  else {
+    recent.innerHTML = last5.map(r =>
+      `<div class="bg-slate-50 rounded-lg px-3 py-2">
+        <span class="font-600 text-slate-700">${r.date}</span> <span class="text-slate-400">|</span>
+        <span class="text-slate-600">${r.absent_teacher} → ${r.relief_teacher}</span>
+        <span class="text-xs text-slate-400 ml-1">(${r.reason})</span>
+      </div>`
+    ).join('');
+  }
+
+  // Top relief
+  const topEl = document.getElementById('top-relief');
+  const freq = {};
+  allRecords.forEach(r => { if (r.relief_teacher) freq[r.relief_teacher] = (freq[r.relief_teacher]||0)+1; });
+  const sorted = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0,5);
+  if (sorted.length === 0) { topEl.innerHTML = '<p class="text-slate-400">Tiada data</p>'; }
+  else {
+    const max = sorted[0][1];
+    topEl.innerHTML = sorted.map(([name,count]) =>
+      `<div class="flex items-center gap-2">
+        <span class="text-sm text-slate-700 w-28 truncate">${name}</span>
+        <div class="flex-1 bg-slate-100 rounded-full h-5 overflow-hidden">
+          <div class="bg-sky-500 h-5 rounded-full flex items-center justify-end pr-2" style="width:${(count/max)*100}%">
+            <span class="text-white text-xs font-600">${count}</span>
+          </div>
+        </div>
+      </div>`
+    ).join('');
+  }
+}
+
+function renderRecords() {
+  const search = (document.getElementById('search-records').value||'').toLowerCase();
+  const month = document.getElementById('filter-month').value;
+  let filtered = allRecords;
+  if (search) filtered = filtered.filter(r =>
+    (r.absent_teacher||'').toLowerCase().includes(search) ||
+    (r.relief_teacher||'').toLowerCase().includes(search) ||
+    (r.class_name||'').toLowerCase().includes(search) ||
+    (r.reason||'').toLowerCase().includes(search)
+  );
+  if (month) filtered = filtered.filter(r => (r.date||'').slice(5,7) === month);
+
+  const tbody = document.getElementById('records-table');
+  const noRec = document.getElementById('no-records');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    noRec.classList.remove('hidden');
+    return;
+  }
+  noRec.classList.add('hidden');
+  tbody.innerHTML = filtered.map((r,i) =>
+    `<tr class="hover:bg-slate-50">
+      <td class="px-4 py-2 text-slate-400">${i+1}</td>
+      <td class="px-4 py-2 font-500">${r.date}</td>
+      <td class="px-4 py-2">${r.day||''}</td>
+      <td class="px-4 py-2">${r.absent_teacher}</td>
+      <td class="px-4 py-2"><span class="bg-amber-100 text-amber-700 text-xs px-2 py-0.5 rounded-full">${r.reason}</span></td>
+      <td class="px-4 py-2">${r.period}</td>
+      <td class="px-4 py-2">${r.class_name}</td>
+      <td class="px-4 py-2">${r.subject}</td>
+      <td class="px-4 py-2 font-500 text-sky-700">${r.relief_teacher}</td>
+      <td class="px-4 py-2"><button onclick="confirmDelete(allRecords[${allRecords.indexOf(r)}])" class="text-red-400 hover:text-red-600"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button></td>
+    </tr>`
+  ).join('');
+  lucide.createIcons();
+}
+
+// ========== ANALYSIS ==========
+function renderAnalysis() {
+  // Donut chart - reasons
+  const reasonCount = {};
+  allRecords.forEach(r => { reasonCount[r.reason] = (reasonCount[r.reason]||0)+1; });
+  const reasons = Object.entries(reasonCount).sort((a,b) => b[1]-a[1]);
+  const total = reasons.reduce((s,r) => s+r[1], 0);
+
+  const svg = document.getElementById('donut-chart');
+  const legend = document.getElementById('donut-legend');
+
+  if (total === 0) {
+    svg.innerHTML = '<text x="100" y="105" text-anchor="middle" fill="#94a3b8" font-size="14">Tiada data</text>';
+    legend.innerHTML = '';
+  } else {
+    let paths = '';
+    let cumAngle = 0;
+    const cx=100, cy=100, r1=80, r2=50;
+    reasons.forEach(([reason, count], i) => {
+      const angle = (count/total)*360;
+      const startRad = (cumAngle-90)*Math.PI/180;
+      const endRad = (cumAngle+angle-90)*Math.PI/180;
+      const largeArc = angle > 180 ? 1 : 0;
+      const x1o = cx+r1*Math.cos(startRad), y1o = cy+r1*Math.sin(startRad);
+      const x2o = cx+r1*Math.cos(endRad), y2o = cy+r1*Math.sin(endRad);
+      const x1i = cx+r2*Math.cos(endRad), y1i = cy+r2*Math.sin(endRad);
+      const x2i = cx+r2*Math.cos(startRad), y2i = cy+r2*Math.sin(startRad);
+      const color = REASON_COLORS[i % REASON_COLORS.length];
+      paths += `<path class="donut-segment" d="M${x1o},${y1o} A${r1},${r1} 0 ${largeArc},1 ${x2o},${y2o} L${x1i},${y1i} A${r2},${r2} 0 ${largeArc},0 ${x2i},${y2i} Z" fill="${color}"/>`;
+      cumAngle += angle;
+    });
+    paths += `<text x="100" y="98" text-anchor="middle" fill="#334155" font-size="22" font-weight="800">${total}</text>`;
+    paths += `<text x="100" y="114" text-anchor="middle" fill="#94a3b8" font-size="10">rekod</text>`;
+    svg.innerHTML = paths;
+
+    legend.innerHTML = reasons.map(([reason,count],i) =>
+      `<div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background:${REASON_COLORS[i%REASON_COLORS.length]}"></span>
+        <span class="flex-1">${reason}</span>
+        <span class="font-600">${count} <span class="text-slate-400">(${Math.round(count/total*100)}%)</span></span>
+      </div>`
+    ).join('');
+  }
+
+  // Absent frequency
+  const absentFreq = {};
+  allRecords.forEach(r => { absentFreq[r.absent_teacher] = (absentFreq[r.absent_teacher]||0)+1; });
+  const absentSorted = Object.entries(absentFreq).sort((a,b) => b[1]-a[1]);
+  const absentEl = document.getElementById('absent-freq');
+  if (absentSorted.length === 0) { absentEl.innerHTML = '<p class="text-slate-400">Tiada data</p>'; }
+  else {
+    const max = absentSorted[0][1];
+    absentEl.innerHTML = absentSorted.map(([n,c]) =>
+      `<div class="flex items-center gap-2">
+        <span class="text-sm w-28 truncate">${n}</span>
+        <div class="flex-1 bg-slate-100 rounded-full h-5 overflow-hidden">
+          <div class="bg-amber-500 h-5 rounded-full flex items-center justify-end pr-2" style="width:${(c/max)*100}%">
+            <span class="text-white text-xs font-600">${c}</span>
+          </div>
+        </div>
+      </div>`
+    ).join('');
+  }
+
+  // Relief frequency
+  const reliefFreq = {};
+  allRecords.forEach(r => { reliefFreq[r.relief_teacher] = (reliefFreq[r.relief_teacher]||0)+1; });
+  const reliefSorted = Object.entries(reliefFreq).sort((a,b) => b[1]-a[1]);
+  const reliefEl = document.getElementById('relief-freq');
+  if (reliefSorted.length === 0) { reliefEl.innerHTML = '<p class="text-slate-400">Tiada data</p>'; }
+  else {
+    const max = reliefSorted[0][1];
+    reliefEl.innerHTML = reliefSorted.map(([n,c]) =>
+      `<div class="flex items-center gap-2">
+        <span class="text-sm w-28 truncate">${n}</span>
+        <div class="flex-1 bg-slate-100 rounded-full h-5 overflow-hidden">
+          <div class="bg-emerald-500 h-5 rounded-full flex items-center justify-end pr-2" style="width:${(c/max)*100}%">
+            <span class="text-white text-xs font-600">${c}</span>
+          </div>
+        </div>
+      </div>`
+    ).join('');
+  }
+
+  // Monthly
+  const monthly = {};
+  allRecords.forEach(r => {
+    const m = (r.date||'').slice(0,7);
+    if (m) monthly[m] = (monthly[m]||0)+1;
+  });
+  const monthSorted = Object.entries(monthly).sort((a,b) => b[0].localeCompare(a[0]));
+  const monthEl = document.getElementById('monthly-analysis');
+  const BULAN = ['','Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+  if (monthSorted.length === 0) { monthEl.innerHTML = '<p class="text-slate-400">Tiada data</p>'; }
+  else {
+    const max = Math.max(...monthSorted.map(m=>m[1]));
+    monthEl.innerHTML = monthSorted.map(([m,c]) => {
+      const [y,mo] = m.split('-');
+      return `<div class="flex items-center gap-2">
+        <span class="text-sm w-28">${BULAN[parseInt(mo)]} ${y}</span>
+        <div class="flex-1 bg-slate-100 rounded-full h-5 overflow-hidden">
+          <div class="bg-violet-500 h-5 rounded-full flex items-center justify-end pr-2" style="width:${(c/max)*100}%">
+            <span class="text-white text-xs font-600">${c}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ========== IMPORT CSV RECORDS ==========
+async function processImportCSV() {
+  const text = document.getElementById('import-csv-text').value.trim();
+  if (!text) return;
+  const lines = text.split('\n').filter(Boolean);
+  let count = 0;
+  for (const line of lines) {
+    if (allRecords.length + count >= 999) { toast('Had 999 rekod!','#ef4444'); break; }
+    const parts = line.split(',').map(s => s.trim());
+    if (parts.length >= 7) {
+      await window.dataSdk.create({
+        type: 'record', date: parts[0], day: getDayName(parts[0]),
+        absent_teacher: parts[1], reason: parts[2], period: parts[3],
+        class_name: parts[4], subject: parts[5], relief_teacher: parts[6],
+        created_at: new Date().toISOString()
+      });
+      if (!teachers.includes(parts[1])) teachers.push(parts[1]);
+      if (!teachers.includes(parts[6])) teachers.push(parts[6]);
+      count++;
+    }
+  }
+  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));
+  hideModal('import-modal');
+  toast(`${count} rekod diimport!`);
+}
+
+// ========== EXPORT CSV ==========
+function exportCSV() {
+  if (allRecords.length === 0) { toast('Tiada rekod untuk eksport','#f59e0b'); return; }
+  downloadCSVFile(allRecords);
+}
+
+function downloadCSVFile(records) {
+  let csv = 'Tarikh,Hari,Guru Tidak Hadir,Sebab,Waktu,Kelas,Subjek,Guru Ganti\n';
+  records.forEach(r => {
+    csv += `${r.date},${r.day},${r.absent_teacher},${r.reason},${r.period},${r.class_name},${r.subject},${r.relief_teacher}\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  const now = new Date();
+  const timestamp = now.toISOString().slice(0,19).replace(/T/,'-').replace(/:/g,'-');
+  link.download = `guru_ganti_${timestamp}.csv`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 100);
+}
+
+// Auto-backup setiap rekod baru - WORD format
+function autoBackupCSV() {
+  if (allRecords.length > 0) {
+    downloadWordFile(allRecords);
+  }
+}
+
+// Download Word Document
+function downloadWordFile(records) {
+  const now = new Date();
+  const timestamp = now.toISOString().slice(0,19).replace(/T/,'-').replace(/:/g,'-');
+  
+  // Build HTML table for Word
+  let html = `
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #1e293b; text-align: center; margin-bottom: 10px; }
+        .info { text-align: center; color: #64748b; font-size: 12px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #1e293b; color: white; padding: 10px; text-align: left; font-weight: bold; border: 1px solid #334155; }
+        td { padding: 8px; border: 1px solid #cbd5e1; }
+        tr:nth-child(even) { background-color: #f1f5f9; }
+        .stat { margin: 20px 0; }
+        .stat-row { display: inline-block; margin-right: 30px; }
+        .stat-label { color: #64748b; font-size: 12px; }
+        .stat-value { color: #1e293b; font-weight: bold; font-size: 16px; }
+      </style>
+    </head>
+    <body>
+      <h1>📋 Laporan Guru Ganti</h1>
+      <div class="info">
+        <p>${document.getElementById('header-school').textContent}</p>
+        <p>Tarikh Cetak: ${now.toLocaleDateString('ms-MY')} ${now.toLocaleTimeString('ms-MY')}</p>
+      </div>
+      
+      <div class="stat">
+        <div class="stat-row">
+          <div class="stat-label">Jumlah Rekod</div>
+          <div class="stat-value">${records.length}</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Jumlah Guru</div>
+          <div class="stat-value">${teachers.length}</div>
+        </div>
+      </div>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tarikh</th>
+            <th>Hari</th>
+            <th>Guru Tidak Hadir</th>
+            <th>Sebab</th>
+            <th>Waktu</th>
+            <th>Kelas</th>
+            <th>Subjek</th>
+            <th>Guru Ganti</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+  
+  records.forEach((r, i) => {
+    html += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${r.date}</td>
+        <td>${r.day || ''}</td>
+        <td>${r.absent_teacher}</td>
+        <td>${r.reason}</td>
+        <td>${r.period}</td>
+        <td>${r.class_name}</td>
+        <td>${r.subject}</td>
+        <td>${r.relief_teacher}</td>
+      </tr>
+    `;
+  });
+  
+  html += `
+        </tbody>
+      </table>
+      <div style="margin-top: 30px; text-align: center; color: #94a3b8; font-size: 11px;">
+        <p>Dokumen dijana automatik oleh Sistem Guru Ganti</p>
+      </div>
+    </body>
+    </html>
+  `;
+  
+  // Convert to Word format
+  const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `guru_ganti_${timestamp}.doc`;
+  link.click();
+  
+  setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
+// Init icons
+lucide.createIcons();
+
+// ========== BADGE UPLOAD ==========
+document.getElementById('badge-upload').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const dataUrl = evt.target.result;
+    badgeImage = dataUrl;
+    localStorage.setItem('sgg_badge', dataUrl);
+    renderBadge();
+    document.getElementById('badge-check').classList.remove('hidden');
+    setTimeout(() => document.getElementById('badge-check').classList.add('hidden'), 3000);
+    toast('✓ Lencana disimpan!', '#10b981');
+  };
+  reader.readAsDataURL(file);
+});
+
+function renderBadge() {
+  const container = document.getElementById('badge-display');
+  const content = document.getElementById('badge-content');
+  
+  if (badgeImage) {
+    container.style.backgroundImage = `url('${badgeImage}')`;
+    container.style.backgroundSize = 'cover';
+    container.style.backgroundPosition = 'center';
+    content.innerHTML = '';
+  } else {
+    container.style.backgroundImage = 'none';
+    content.innerHTML = `
+      <div class="flex flex-col items-center justify-center">
+        <i data-lucide="shield" style="width:32px;height:32px;color:white;opacity:0.8;"></i>
+        <span class="text-xs text-white/70 mt-2 font-medium text-center">Klik untuk upload</span>
+      </div>
+    `;
+  }
+  lucide.createIcons();
+}
+
+// ========== SCHOOL NAME EDIT ==========
+const schoolNameInput = document.getElementById('school-name-edit');
+schoolNameInput.addEventListener('blur', function() {
+  const name = this.value.trim();
+  if (name) {
+    localStorage.setItem('sgg_school_name', name);
+    document.getElementById('header-school').textContent = name;
+    toast('Nama sekolah disimpan!', '#10b981');
+  }
+});
+
+schoolNameInput.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    this.blur();
+  }
+});
+
+// Load saved school name
+const savedSchoolName = localStorage.getItem('sgg_school_name') || 'SK Contoh';
+schoolNameInput.value = savedSchoolName;
+document.getElementById('header-school').textContent = savedSchoolName;
+
+// Render badge on load
+renderBadge();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e712b349562abd7',t:'MTc3NTMxNDY4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
