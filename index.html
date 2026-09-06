@@ -50,6 +50,52 @@ html, body { height: 100%; margin: 0; }
   <style>body { box-sizing: border-box; }</style>
  </head>
  <body class="h-full bg-gradient-to-br from-slate-50 via-white to-slate-50">
+<div id="ck-auth-overlay" style="position:fixed;inset:0;background:#0f172a;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:'Segoe UI',sans-serif">
+  <div style="width:100%;max-width:340px;background:#1e293b;border-radius:16px;padding:28px 26px;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+    <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:2px">Sistem Guru Ganti Pro</div>
+    <div id="ck-auth-title" style="font-size:13px;color:#94a3b8;margin-bottom:18px">Log masuk untuk teruskan</div>
+    <div id="ck-auth-err" style="font-size:11.5px;color:#fca5a5;margin-bottom:8px;min-height:14px"></div>
+    <div id="ck-login-block">
+      <label style="font-size:11px;color:#94a3b8;font-weight:700">NAMA PENGGUNA</label>
+      <input id="ck-user" style="width:100%;box-sizing:border-box;padding:9px 11px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:13px;margin:4px 0 12px" placeholder="nama.pengguna">
+      <label style="font-size:11px;color:#94a3b8;font-weight:700">KATA LALUAN</label>
+      <input id="ck-pass" type="password" style="width:100%;box-sizing:border-box;padding:9px 11px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:13px;margin:4px 0 16px" onkeydown="if(event.key==='Enter')ckDoLogin()">
+      <button onclick="ckDoLogin()" style="width:100%;padding:11px;border:none;border-radius:8px;background:#2563eb;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Log Masuk &rarr;</button>
+      <div style="font-size:10.5px;color:#64748b;text-align:center;margin-top:10px">Tiada akaun? Hubungi admin sekolah anda.</div>
+    </div>
+    <div id="ck-fpw-block" style="display:none">
+      <label style="font-size:11px;color:#94a3b8;font-weight:700">KATA LALUAN BARU</label>
+      <input id="ck-fpw-new" type="password" style="width:100%;box-sizing:border-box;padding:9px 11px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:13px;margin:4px 0 12px" placeholder="min. 6 aksara">
+      <label style="font-size:11px;color:#94a3b8;font-weight:700">SAHKAN KATA LALUAN</label>
+      <input id="ck-fpw-conf" type="password" style="width:100%;box-sizing:border-box;padding:9px 11px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:13px;margin:4px 0 16px">
+      <button onclick="ckForcePwSubmit()" style="width:100%;padding:11px;border:none;border-radius:8px;background:#2563eb;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Simpan &amp; Teruskan &rarr;</button>
+    </div>
+  </div>
+</div>
+<div id="ck-topbar" style="display:none;position:fixed;top:0;left:0;right:0;height:40px;background:#0f172a;color:#fff;font-size:11.5px;align-items:center;padding:0 14px;z-index:9998;font-family:'Segoe UI',sans-serif;gap:10px">
+  <span id="ck-userlabel" style="font-weight:700;flex:1"></span>
+  <button id="ck-admin-btn" onclick="ckOpenAdmin()" style="display:none;background:none;border:1px solid #475569;color:#cbd5e1;border-radius:6px;padding:4px 10px;font-size:10.5px;cursor:pointer">&#9881; Admin</button>
+  <button onclick="ckDoLogout()" style="background:none;border:1px solid #475569;color:#cbd5e1;border-radius:6px;padding:4px 10px;font-size:10.5px;cursor:pointer">Keluar</button>
+</div>
+<div id="ck-admin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99998;align-items:center;justify-content:center;font-family:'Segoe UI',sans-serif">
+  <div style="width:100%;max-width:380px;max-height:80vh;overflow:auto;background:#1e293b;border-radius:16px;padding:22px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:15px;font-weight:800;color:#fff">Urus Pengguna</div>
+      <button onclick="ckCloseAdmin()" style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer">&times;</button>
+    </div>
+    <label style="font-size:11px;color:#94a3b8;font-weight:700">NAMA PENGGUNA BARU</label>
+    <input id="ck-nu-name" style="width:100%;box-sizing:border-box;padding:9px 11px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:13px;margin:4px 0 8px" placeholder="cth: guru_ali">
+    <div style="font-size:10px;color:#64748b;margin-bottom:8px">Kata laluan dijana automatik (random) — akan dipaparkan selepas tambah.</div>
+    <select id="ck-nu-role" style="width:100%;box-sizing:border-box;padding:9px 11px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:13px;margin-bottom:10px">
+      <option value="user">Pengguna</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button onclick="ckAddUser()" style="width:100%;padding:10px;border:none;border-radius:8px;background:#2563eb;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;margin-bottom:10px">+ Tambah Pengguna</button>
+    <div id="ck-adm-msg" style="font-size:11px;margin-bottom:10px"></div>
+    <div id="ck-user-list" style="display:flex;flex-direction:column;gap:6px"></div>
+  </div>
+</div>
+
   <div id="app" class="h-full w-full flex flex-col overflow-auto"><!-- Header -->
    <header class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white px-4 py-6 sm:px-8 flex-shrink-0 border-b border-slate-700/50 shadow-xl">
     <div class="max-w-7xl mx-auto">
@@ -74,7 +120,7 @@ html, body { height: 100%; margin: 0; }
     </div>
    </header><!-- Tabs -->
    <nav class="flex-shrink-0 bg-white border-b border-slate-200/80 px-4 sm:px-8">
-    <div class="max-w-7xl mx-auto flex gap-1 py-3 overflow-x-auto"><button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-active px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="layout-dashboard" style="width:16px;height:16px"></i> Dashboard </button> <button onclick="switchTab('entry')" id="tab-entry" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="plus-circle" style="width:16px;height:16px"></i> Rekod Baru </button> <button onclick="switchTab('teachers')" id="tab-teachers" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="users" style="width:16px;height:16px"></i> Senarai Guru </button> <button onclick="switchTab('subjects')" id="tab-subjects" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="book" style="width:16px;height:16px"></i> Subjek Guru </button> <button onclick="switchTab('schedule')" id="tab-schedule" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="calendar" style="width:16px;height:16px"></i> Jadual </button> <button onclick="switchTab('records')" id="tab-records" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="file-text" style="width:16px;height:16px"></i> Rekod </button> <button onclick="switchTab('analysis')" id="tab-analysis" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="bar-chart-3" style="width:16px;height:16px"></i> Analisis </button>
+    <div class="max-w-7xl mx-auto flex gap-1 py-3 overflow-x-auto"><button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-active px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="layout-dashboard" style="width:16px;height:16px"></i> Dashboard </button> <button onclick="switchTab('entry')" id="tab-entry" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="plus-circle" style="width:16px;height:16px"></i> Rekod Baru </button> <button onclick="switchTab('teachers')" id="tab-teachers" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="users" style="width:16px;height:16px"></i> Senarai Guru </button> <button onclick="switchTab('schedule')" id="tab-schedule" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="calendar" style="width:16px;height:16px"></i> Jadual </button> <button onclick="switchTab('records')" id="tab-records" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="file-text" style="width:16px;height:16px"></i> Rekod </button> <button onclick="switchTab('analysis')" id="tab-analysis" class="tab-inactive px-6 py-2.5 rounded-lg text-sm font-600 whitespace-nowrap transition-all flex items-center gap-2"> <i data-lucide="bar-chart-3" style="width:16px;height:16px"></i> Analisis </button>
     </div>
    </nav><!-- Content -->
    <main class="flex-1 px-4 sm:px-8 py-8 overflow-auto">
@@ -115,14 +161,14 @@ html, body { height: 100%; margin: 0; }
        </div>
       </div><!-- Dashboard Cards -->
       <div class="grid sm:grid-cols-2 gap-6">
-       <div class="premium-card">
-        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+       <div class="premium-card" style="background:#f0f9ff;border-color:#bae6fd;">
+        <div class="px-6 py-5 border-b border-sky-100 flex items-center justify-between">
          <h3 class="font-700 heading text-slate-900 text-lg flex items-center gap-2"><i data-lucide="clock" style="width:20px;height:20px;color:#3b82f6;"></i> Rekod Terkini</h3><span class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-600">Terbaru</span>
         </div>
         <div id="recent-records" class="p-6 space-y-3 max-h-80 overflow-auto"></div>
        </div>
-       <div class="premium-card">
-        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+       <div class="premium-card" style="background:#fffbeb;border-color:#fde68a;">
+        <div class="px-6 py-5 border-b border-amber-100 flex items-center justify-between">
          <h3 class="font-700 heading text-slate-900 text-lg flex items-center gap-2"><i data-lucide="star" style="width:20px;height:20px;color:#f59e0b;"></i> Guru Ganti Paling Kerap</h3><span class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-600">Top</span>
         </div>
         <div id="top-relief" class="p-6 space-y-3 max-h-80 overflow-auto"></div>
@@ -145,93 +191,45 @@ html, body { height: 100%; margin: 0; }
         <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Guru Tidak Hadir</label> <select id="f-absent" class="input-field w-full" required> <option value="">-- Pilih Guru --</option> </select>
         </div><!-- Reason -->
         <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Sebab Tidak Hadir</label> <select id="f-reason" class="input-field w-full" required> <option value="">-- Pilih Sebab --</option> <option>Mesyuarat Luar</option> <option>Kursus</option> <option>Cuti Sakit</option> <option>Cuti Kecemasan</option> <option>Cuti Rehat</option> <option>Hal Ehwal Peribadi</option> <option>Program Sekolah</option> <option>Lain-lain</option> </select>
-        </div><!-- Period, Class, Subject Row -->
-        <div class="grid sm:grid-cols-3 gap-4">
-         <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Waktu/Slot</label> <select id="f-period" class="input-field w-full text-sm" required> <option value="">-- Pilih --</option> <option>Waktu 1</option><option>Waktu 2</option><option>Waktu 3</option><option>Waktu 4</option><option>Waktu 5</option> <option>Waktu 6</option><option>Waktu 7</option><option>Waktu 8</option><option>Waktu 9</option><option>Waktu 10</option> </select>
+        </div><!-- Period Slot Picker (butang + untuk tambah slot lain: satu guru boleh ada beberapa slot kelas sehari) -->
+        <div><label class="block text-sm font-600 text-slate-700 mb-2">Waktu/Slot Tidak Hadir</label>
+         <p class="text-xs text-slate-500 mb-2.5">Tekan "+ Tambah Slot" jika guru ini ada beberapa kelas pada hari yang sama.</p>
+        </div><!-- Relief Mode Toggle -->
+        <div><label class="block text-sm font-600 text-slate-700 mb-3">Kaedah Pemilihan Guru Ganti</label>
+         <div class="flex gap-3"><button type="button" id="mode-auto-btn" onclick="switchMode('auto')" class="flex-1 py-2.5 rounded-lg text-sm font-600 transition-all flex items-center justify-center gap-2 bg-blue-100 text-blue-700 border-2 border-blue-300"> <i data-lucide="zap" style="width:16px;height:16px"></i> Auto (AI) </button> <button type="button" id="mode-manual-btn" onclick="switchMode('manual')" class="flex-1 py-2.5 rounded-lg text-sm font-600 transition-all flex items-center justify-center gap-2 bg-slate-100 text-slate-600 border-2 border-slate-200"> <i data-lucide="user" style="width:16px;height:16px"></i> Manual </button>
          </div>
-         <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Kelas</label> <input type="text" id="f-class" class="input-field w-full text-sm" placeholder="cth: 4 Bestari" required>
-         </div>
-         <div><label class="block text-sm font-600 text-slate-700 mb-2.5">Mata Pelajaran</label> <input type="text" id="f-subject" class="input-field w-full text-sm" placeholder="cth: Matematik" required>
-         </div>
-        </div><!-- Relief Teacher Selection -->
-        <div><label class="block text-sm font-600 text-slate-700 mb-3">Pemilihan Guru Ganti</label>
-         <div class="flex gap-3 mb-4"><button type="button" id="mode-auto-btn" onclick="switchMode('auto')" class="flex-1 py-2.5 rounded-lg text-sm font-600 transition-all flex items-center justify-center gap-2 bg-blue-100 text-blue-700 border-2 border-blue-300"> <i data-lucide="zap" style="width:16px;height:16px"></i> Auto (AI) </button> <button type="button" id="mode-manual-btn" onclick="switchMode('manual')" class="flex-1 py-2.5 rounded-lg text-sm font-600 transition-all flex items-center justify-center gap-2 bg-slate-100 text-slate-600 border-2 border-slate-200"> <i data-lucide="user" style="width:16px;height:16px"></i> Manual </button>
-         </div><!-- Auto Mode -->
-         <div id="mode-auto-panel" class="space-y-3">
-          <div id="relief-ranking" class="bg-gradient-to-br from-blue-50 to-slate-50 border border-blue-100 rounded-lg p-4 space-y-2 max-h-48 overflow-auto text-sm"></div><button type="button" onclick="autoAssignRelief()" class="btn-primary w-full flex items-center justify-center gap-2"> <i data-lucide="sparkles" style="width:16px;height:16px"></i> Pilih Yang Terbaik (Paling Kurang Tugas) </button>
-         </div><!-- Manual Mode -->
-         <div id="mode-manual-panel" class="hidden"><select id="f-relief" class="input-field w-full" required> <option value="">-- Pilih Guru Ganti --</option> </select>
-         </div>
-        </div><!-- Submit Button --> <button type="submit" id="btn-submit" class="btn-primary w-full py-3 rounded-lg font-600 flex items-center justify-center gap-2 text-base shadow-lg hover:shadow-xl"> <i data-lucide="save" style="width:18px;height:18px"></i> Simpan Rekod </button>
+        </div><!-- Per-Slot Rows: Waktu, Kelas, Subjek & Guru Ganti -->
+        <div id="period-slots-container" class="space-y-3"></div><!-- Submit Button --> <button type="submit" id="btn-submit" class="btn-primary w-full py-3 rounded-lg font-600 flex items-center justify-center gap-2 text-base shadow-lg hover:shadow-xl"> <i data-lucide="save" style="width:18px;height:18px"></i> Simpan Rekod </button>
        </form>
       </div>
      </div>
-     <div class="grid sm:grid-cols-2 gap-3">
-      <div><label class="block text-xs font-600 text-slate-600 mb-1">Tarikh</label> <input type="date" id="f-date" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" required>
-      </div>
-      <div><label class="block text-xs font-600 text-slate-600 mb-1">Hari</label> <input type="text" id="f-day" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 text-slate-500" readonly>
-      </div>
-     </div>
-     <div><label class="block text-xs font-600 text-slate-600 mb-1">Guru Tidak Hadir</label> <select id="f-absent" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" required> <option value="">-- Pilih Guru --</option> </select>
-     </div>
-     <div><label class="block text-xs font-600 text-slate-600 mb-1">Sebab</label> <select id="f-reason" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" required> <option value="">-- Pilih Sebab --</option> <option>Mesyuarat Luar</option> <option>Kursus</option> <option>Cuti Sakit</option> <option>Cuti Kecemasan</option> <option>Cuti Rehat</option> <option>Hal Ehwal Peribadi</option> <option>Program Sekolah</option> <option>Lain-lain</option> </select>
-     </div>
-     <div class="grid sm:grid-cols-3 gap-3">
-      <div><label class="block text-xs font-600 text-slate-600 mb-1">Waktu/Slot</label> <select id="f-period" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" required> <option value="">-- Pilih --</option> <option>Waktu 1</option><option>Waktu 2</option><option>Waktu 3</option> <option>Waktu 4</option><option>Waktu 5</option><option>Waktu 6</option> <option>Waktu 7</option><option>Waktu 8</option><option>Waktu 9</option><option>Waktu 10</option> </select>
-      </div>
-      <div><label class="block text-xs font-600 text-slate-600 mb-1">Kelas</label> <input type="text" id="f-class" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" placeholder="cth: 4 Bestari" required>
-      </div>
-      <div><label class="block text-xs font-600 text-slate-600 mb-1">Mata Pelajaran</label> <input type="text" id="f-subject" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" placeholder="cth: Matematik" required>
-      </div>
-     </div>
-     <div><label class="block text-xs font-600 text-slate-600 mb-2">Guru Ganti</label>
-      <div class="space-y-2">
-       <div class="flex gap-1.5 mb-2"><button type="button" id="mode-auto-btn" onclick="switchMode('auto')" class="flex-1 text-xs font-600 py-1.5 rounded-lg bg-sky-100 text-sky-700 border border-sky-300 transition">⚡ Auto (AI)</button> <button type="button" id="mode-manual-btn" onclick="switchMode('manual')" class="flex-1 text-xs font-600 py-1.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 transition">👤 Manual</button>
-       </div>
-       <div id="mode-auto-panel" class="space-y-2">
-        <div id="relief-ranking" class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2 max-h-40 overflow-auto text-sm"></div><button type="button" onclick="autoAssignRelief()" class="w-full text-xs text-white bg-sky-600 hover:bg-sky-700 font-600 py-2 rounded-lg transition">Pilih Top (Paling Kurang)</button>
-       </div>
-       <div id="mode-manual-panel" class="hidden"><select id="f-relief" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none" required> <option value="">-- Pilih Guru Ganti --</option> </select>
-       </div>
-      </div>
-     </div><button type="submit" id="btn-submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-600 py-2.5 rounded-lg transition flex items-center justify-center gap-2"> <i data-lucide="plus-circle" style="width:16px;height:16px"></i> Simpan Rekod </button>
-    </div>
-   </main>
-  </div><!-- TEACHERS TAB -->
+  <!-- TEACHERS TAB -->
   <div id="page-teachers" class="hidden fade-in">
-   <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm max-w-2xl mb-4">
+   <div class="bg-emerald-50 rounded-xl p-5 border border-emerald-200 shadow-sm max-w-2xl mb-4">
     <h3 class="font-700 text-slate-800 mb-3">Tambah Guru</h3>
     <div class="flex gap-2"><input type="text" id="new-teacher" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none text-sm" placeholder="Nama guru..."> <button onclick="addTeacher()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-600 transition">Tambah</button>
     </div>
     <div class="mt-3 flex gap-2"><button onclick="showCSVTeacherModal()" class="text-xs text-sky-600 hover:text-sky-800 font-600 flex items-center gap-1"><i data-lucide="upload" style="width:12px;height:12px"></i> Import CSV</button> <button onclick="downloadTeacherTemplate()" class="text-xs text-emerald-600 hover:text-emerald-800 font-600 flex items-center gap-1"><i data-lucide="download" style="width:12px;height:12px"></i> Template CSV</button>
     </div>
    </div>
-   <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm max-w-2xl">
-    <h3 class="font-700 text-slate-800 mb-3">Senarai Guru (<span id="teacher-count">0</span>)</h3>
-    <div id="teacher-list" class="space-y-1 max-h-96 overflow-auto"></div>
-   </div>
-  </div><!-- SUBJECTS TAB -->
-  <div id="page-subjects" class="hidden fade-in">
-   <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm max-w-2xl mb-4">
-    <h3 class="font-700 text-slate-800 mb-4">Set Subjek Mengajar Guru</h3>
-    <div class="space-y-3">
-     <div><label class="block text-xs font-600 text-slate-600 mb-1">Pilih Guru</label> <select id="subject-teacher" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none text-sm" onchange="loadTeacherSubjects()"> <option value="">-- Pilih Guru --</option> </select>
-     </div>
-     <div><label class="block text-xs font-600 text-slate-600 mb-2">Subjek Mengajar (dipisahkan koma)</label> <textarea id="subject-input" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none text-sm" rows="3" placeholder="Contoh: Matematik, Sains, Bahasa Inggeris"></textarea>
-      <div class="text-xs text-slate-400 mt-1">
-       Masukkan semua subjek yang guru ajar, dipisahkan koma
-      </div>
-     </div><button onclick="saveTeacherSubjects()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-600 py-2 rounded-lg transition text-sm">Simpan Subjek</button>
-    </div>
-   </div>
-   <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm max-w-2xl">
-    <h3 class="font-700 text-slate-800 mb-4">Subjek Guru Terkini</h3>
-    <div id="subject-list" class="space-y-2 max-h-96 overflow-auto text-sm"></div>
+   <div class="bg-sky-50 rounded-xl p-5 border border-sky-200 shadow-sm">
+    <h3 class="font-700 text-slate-800 mb-1">Senarai Guru (<span id="teacher-count">0</span>)</h3>
+    <p class="text-xs text-slate-500 mb-3">Isi subjek yang diajar setiap guru terus di sini. Tekan "+ Subjek" jika guru mengajar lebih daripada 3 subjek.</p>
+    <div id="teacher-list" class="space-y-2 max-h-[32rem] overflow-auto"></div>
    </div>
   </div><!-- SCHEDULE TAB -->
   <div id="page-schedule" class="hidden fade-in">
+   <div class="bg-amber-50 rounded-xl p-5 border border-amber-200 shadow-sm mb-4">
+    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+     <h3 class="font-700 text-slate-800">⚙️ Tetapan Waktu Sekolah</h3>
+     <button onclick="addPeriodRowUI()" class="text-xs bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg font-600">+ Tambah Waktu</button>
+    </div>
+    <p class="text-xs text-slate-500 mb-3">Tetapkan bilangan waktu & masa setiap waktu ikut keperluan sekolah. Perubahan terus digunakan pada jadual guru, borang rekod dan cadangan guru ganti automatik.</p>
+    <div id="period-settings-list" class="space-y-2 mb-3"></div>
+    <button onclick="savePeriodSettings()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-600 py-2 rounded-lg transition text-sm">Simpan Tetapan Waktu</button>
+   </div>
    <div class="grid sm:grid-cols-2 gap-4">
-    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+    <div class="bg-emerald-50 rounded-xl p-5 border border-emerald-200 shadow-sm">
      <h3 class="font-700 text-slate-800 mb-4">Set Jadual Guru</h3>
      <div class="space-y-3">
       <div><label class="block text-xs font-600 text-slate-600 mb-1">Pilih Guru</label> <select id="schedule-teacher" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-300 outline-none text-sm" onchange="renderScheduleGrid()"> <option value="">-- Pilih Guru --</option> </select>
@@ -242,7 +240,7 @@ html, body { height: 100%; margin: 0; }
       <div id="schedule-grid" class="bg-slate-50 rounded-lg p-3 border border-slate-200 overflow-x-auto"></div><button onclick="saveTeacherSchedule()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-600 py-2 rounded-lg transition text-sm">Simpan Jadual</button>
      </div>
     </div>
-    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+    <div class="bg-sky-50 rounded-xl p-5 border border-sky-200 shadow-sm">
      <h3 class="font-700 text-slate-800 mb-4">Jadual Terkini</h3>
      <div id="schedule-list" class="space-y-2 max-h-96 overflow-auto text-sm"></div>
     </div>
@@ -278,29 +276,31 @@ html, body { height: 100%; margin: 0; }
   </div><!-- ANALYSIS TAB -->
   <div id="page-analysis" class="hidden fade-in">
    <div class="grid sm:grid-cols-2 gap-4 mb-4">
-    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+    <div class="bg-violet-50 rounded-xl p-5 border border-violet-200 shadow-sm">
      <h3 class="font-700 text-slate-800 mb-4 text-sm">Sebab Tidak Hadir</h3>
      <div class="flex items-center justify-center">
       <svg id="donut-chart" viewbox="0 0 200 200" width="200" height="200"></svg>
      </div>
      <div id="donut-legend" class="mt-4 space-y-1 text-xs"></div>
     </div>
-    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+    <div class="bg-rose-50 rounded-xl p-5 border border-rose-200 shadow-sm">
      <h3 class="font-700 text-slate-800 mb-4 text-sm">Kekerapan Guru Tidak Hadir</h3>
      <div id="absent-freq" class="space-y-2 max-h-72 overflow-auto"></div>
     </div>
    </div>
    <div class="grid sm:grid-cols-2 gap-4">
-    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+    <div class="bg-sky-50 rounded-xl p-5 border border-sky-200 shadow-sm">
      <h3 class="font-700 text-slate-800 mb-4 text-sm">Kekerapan Guru Ganti</h3>
      <div id="relief-freq" class="space-y-2 max-h-72 overflow-auto"></div>
     </div>
-    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+    <div class="bg-amber-50 rounded-xl p-5 border border-amber-200 shadow-sm">
      <h3 class="font-700 text-slate-800 mb-4 text-sm">Analisis Bulanan</h3>
      <div id="monthly-analysis" class="space-y-2 max-h-72 overflow-auto"></div>
     </div>
    </div>
-  </div> <!-- Import Modal -->
+  </div>
+    </div>
+   </main><!-- Import Modal -->
   <div id="import-modal" class="confirm-overlay hidden">
    <div class="bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
     <h3 class="font-700 text-slate-800 mb-2">Import CSV Rekod</h3>
@@ -326,12 +326,280 @@ Ahmad bin Hassan"></textarea>
     </div>
    </div>
   </div>
+  </div>
   <script>
-// ========== STATE ==========
-let allRecords = [];
+// ══════════════════════════════════════════════════════════
+// CIKGUKITA AUTH MODULE (Supabase Auth + RLS)
+// ══════════════════════════════════════════════════════════
+var SB_URL = 'https://aowzftmdriukxbltjtpm.supabase.co';
+var SB_ANON_KEY = 'PASTE_ANON_KEY_DI_SINI'; // <-- ganti dengan anon key projek Supabase
+var SB_FN_ADMIN = SB_URL + '/functions/v1/relief-admin';
+var CK_TABLE = 'relief_data';
+
+var ckUrlParams = new URLSearchParams(window.location.search);
+var KOD_SEKOLAH = (ckUrlParams.get('t') || '').trim().toUpperCase();
+
+function ckMakeEmail(username, kodSekolah){
+  var u = (username||'').trim().toLowerCase().replace(/[^a-z0-9_.]/g,'');
+  var k = (kodSekolah||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+  return u + '.' + k + '@cikgukita.internal';
+}
+
+var CK_SESS = null;
+var CK_CU = null;
+var CK_SKEY = 'ck_sess_v1_' + (KOD_SEKOLAH||'nokod') + '_' + CK_TABLE;
+function ckLoadSess(){ try{ return JSON.parse(localStorage.getItem(CK_SKEY)); }catch(e){ return null; } }
+function ckSaveSess(){ localStorage.setItem(CK_SKEY, JSON.stringify(CK_SESS)); }
+function ckClearSess(){ localStorage.removeItem(CK_SKEY); }
+
+async function ckFetch(path, opts){
+  opts = opts || {};
+  var headers = Object.assign({'apikey': SB_ANON_KEY,'Content-Type':'application/json'}, opts.headers||{});
+  headers['Authorization'] = 'Bearer ' + ((CK_SESS&&CK_SESS.access_token) ? CK_SESS.access_token : SB_ANON_KEY);
+  return fetch(SB_URL + path, Object.assign({}, opts, {headers:headers}));
+}
+
+async function ckFetchProfile(){
+  try{
+    var res = await ckFetch('/rest/v1/'+CK_TABLE+'?select=username,role,kod_sekolah,must_change_password&user_id=eq.'+CK_SESS.user_id, {method:'GET'});
+    if(!res.ok) return false;
+    var rows = await res.json();
+    if(!rows.length) return false;
+    CK_CU = rows[0];
+    return true;
+  }catch(e){ return false; }
+}
+async function ckRefreshToken(){
+  if(!CK_SESS||!CK_SESS.refresh_token) return false;
+  var res = await ckFetch('/auth/v1/token?grant_type=refresh_token', {method:'POST', body: JSON.stringify({refresh_token:CK_SESS.refresh_token})});
+  if(!res.ok) return false;
+  var d = await res.json();
+  CK_SESS = {access_token:d.access_token, refresh_token:d.refresh_token, user_id:d.user.id};
+  ckSaveSess();
+  return true;
+}
+
+async function ckBoot(){
+  if(!KOD_SEKOLAH){
+    document.getElementById('ck-auth-err').textContent = 'URL tiada kod sekolah (?t=KODSEKOLAH). Hubungi admin.';
+    return;
+  }
+  CK_SESS = ckLoadSess();
+  if(CK_SESS && CK_SESS.access_token){
+    if(await ckFetchProfile()){ await ckLoginOK(); return; }
+    if(await ckRefreshToken() && await ckFetchProfile()){ await ckLoginOK(); return; }
+  }
+  ckClearSess(); CK_SESS=null; CK_CU=null;
+}
+
+async function ckDoLogin(){
+  var u = document.getElementById('ck-user').value.trim();
+  var p = document.getElementById('ck-pass').value;
+  var err = document.getElementById('ck-auth-err');
+  err.textContent='';
+  if(!KOD_SEKOLAH){ err.textContent='URL tiada kod sekolah (?t=KODSEKOLAH).'; return; }
+  if(!u||!p){ err.textContent='Sila isi semua maklumat.'; return; }
+  var email = ckMakeEmail(u, KOD_SEKOLAH);
+  try{
+    var res = await ckFetch('/auth/v1/token?grant_type=password', {method:'POST', body: JSON.stringify({email:email,password:p})});
+    if(!res.ok){ err.textContent='Nama pengguna atau kata laluan tidak sah.'; return; }
+    var d = await res.json();
+    CK_SESS = {access_token:d.access_token, refresh_token:d.refresh_token, user_id:d.user.id};
+    ckSaveSess();
+    if(!await ckFetchProfile()){ err.textContent='Akaun wujud tapi profil tidak dijumpai. Hubungi admin.'; return; }
+    document.getElementById('ck-pass').value='';
+    await ckLoginOK();
+  }catch(e){ err.textContent='Ralat sambungan. Cuba lagi.'; }
+}
+
+async function ckLoginOK(){
+  if(CK_CU.must_change_password){
+    document.getElementById('ck-login-block').style.display='none';
+    document.getElementById('ck-fpw-block').style.display='block';
+    document.getElementById('ck-auth-title').textContent='Set kata laluan baru (kali pertama)';
+    return;
+  }
+  document.getElementById('ck-auth-overlay').style.display='none';
+  document.getElementById('ck-topbar').style.display='flex';
+  document.getElementById('ck-userlabel').textContent='\u{1F464} ' + CK_CU.username + ' \u00b7 ' + KOD_SEKOLAH;
+  if(CK_CU.role==='admin') document.getElementById('ck-admin-btn').style.display='inline-block';
+  document.body.style.paddingTop = '40px';
+  await ckOnLoginHook();
+}
+
+function ckDoLogout(){
+  CK_CU=null; CK_SESS=null; ckClearSess();
+  document.getElementById('ck-topbar').style.display='none';
+  document.getElementById('ck-auth-overlay').style.display='flex';
+  document.getElementById('ck-login-block').style.display='block';
+  document.getElementById('ck-fpw-block').style.display='none';
+  document.getElementById('ck-user').value=''; document.getElementById('ck-pass').value='';
+  document.getElementById('ck-auth-err').textContent='';
+  document.body.style.paddingTop = '';
+  ckCloseAdmin();
+}
+
+async function ckForcePwSubmit(){
+  var nw=document.getElementById('ck-fpw-new').value;
+  var cf=document.getElementById('ck-fpw-conf').value;
+  var err=document.getElementById('ck-auth-err');
+  if(nw.length<6){ err.textContent='Min. 6 aksara.'; return; }
+  if(nw!==cf){ err.textContent='Tidak sepadan.'; return; }
+  var res = await ckFetch('/auth/v1/user', {method:'PUT', body: JSON.stringify({password:nw})});
+  if(!res.ok){ err.textContent='Gagal tukar kata laluan. Cuba lagi.'; return; }
+  await ckFetch('/rest/v1/'+CK_TABLE+'?user_id=eq.'+CK_SESS.user_id, {method:'PATCH', headers:{'Prefer':'return=minimal'}, body: JSON.stringify({must_change_password:false})});
+  location.reload();
+}
+
+function ckOpenAdmin(){ if(!CK_CU||CK_CU.role!=='admin')return; ckRenderUserList(); document.getElementById('ck-admin-modal').style.display='flex'; }
+function ckCloseAdmin(){ document.getElementById('ck-admin-modal').style.display='none'; }
+async function ckAdmFn(action, payload){
+  var res = await fetch(SB_FN_ADMIN, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+CK_SESS.access_token,'apikey':SB_ANON_KEY},
+    body: JSON.stringify(Object.assign({action:action}, payload||{}))
+  });
+  var d = await res.json();
+  if(!res.ok) throw new Error(d.error||'Ralat pelayan');
+  return d;
+}
+async function ckRenderUserList(){
+  var el=document.getElementById('ck-user-list'); el.innerHTML='Memuatkan...';
+  try{
+    var d = await ckAdmFn('list_users');
+    el.innerHTML='';
+    d.users.forEach(function(u){
+      var row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:8px;font-size:11.5px;padding:7px 9px;background:#0f172a;border-radius:8px;color:#e2e8f0';
+      row.innerHTML='<span style="font-weight:700;flex:1">'+u.username+'</span>'
+        +'<span style="font-size:9px;padding:1px 6px;border-radius:8px;background:'+(u.role==='admin'?'rgba(37,99,235,.25);color:#93c5fd':'rgba(148,163,184,.2);color:#cbd5e1')+'">'+(u.role==='admin'?'Admin':'Pengguna')+'</span>'
+        +(u.must_change_password?'<span style="font-size:9px;color:#fbbf24">Belum tukar</span>':'')
+        +(u.username===CK_CU.username?'<span style="font-size:9px;color:#64748b">Anda</span>'
+          :'<button onclick="ckDelUser(\''+u.username+'\')" style="border:1px solid #7f1d1d;background:none;color:#fca5a5;border-radius:6px;font-size:10px;padding:3px 8px;cursor:pointer">Buang</button>');
+      el.appendChild(row);
+    });
+  }catch(e){ el.innerHTML='<span style="color:#fca5a5;font-size:11px">Ralat: '+e.message+'</span>'; }
+}
+async function ckAddUser(){
+  var n=document.getElementById('ck-nu-name').value.trim();
+  var r=document.getElementById('ck-nu-role').value;
+  var m=document.getElementById('ck-adm-msg');
+  if(!n){ m.innerHTML='<span style="color:#fca5a5">Nama diperlukan.</span>'; return; }
+  m.textContent='Mencipta akaun...';
+  try{
+    var d = await ckAdmFn('create_user', {username:n, role:r});
+    document.getElementById('ck-nu-name').value='';
+    m.innerHTML='<span style="color:#86efac">&#10003; "'+d.username+'" dicipta.<br>Pasword: <b style="user-select:all">'+d.password+'</b><br>(Wajib ditukar bila log masuk kali pertama)</span>';
+    ckRenderUserList();
+  }catch(e){ m.innerHTML='<span style="color:#fca5a5">'+e.message+'</span>'; }
+}
+async function ckDelUser(username){
+  if(!confirm('Padam pengguna "'+username+'"?')) return;
+  try{ await ckAdmFn('delete_user', {username:username}); ckRenderUserList(); }
+  catch(e){ alert('Gagal padam: '+e.message); }
+}
+
+// ── Cloud sync generik (1 blob JSON per pengguna, kunci 'data') ──
+async function ckCloudPush(obj){
+  if(!CK_CU||!CK_SESS) return false;
+  try{
+    var res = await ckFetch('/rest/v1/'+CK_TABLE+'?user_id=eq.'+CK_SESS.user_id, {
+      method:'PATCH', headers:{'Prefer':'return=minimal'},
+      body: JSON.stringify({data: obj})
+    });
+    return res.ok;
+  }catch(e){ return false; }
+}
+async function ckCloudPull(){
+  if(!CK_CU||!CK_SESS) return null;
+  try{
+    var res = await ckFetch('/rest/v1/'+CK_TABLE+'?select=data&user_id=eq.'+CK_SESS.user_id, {method:'GET'});
+    if(!res.ok) return null;
+    var rows = await res.json();
+    if(!rows.length || !rows[0].data || !Object.keys(rows[0].data).length) return null;
+    return rows[0].data;
+  }catch(e){ return null; }
+}
+
+// ── Relief-specific: bundle 6 kunci localStorage jadi 1 blob ──
+var _reliefSaveTimer=null;
+function reliefCloudPush(){
+  clearTimeout(_reliefSaveTimer);
+  _reliefSaveTimer=setTimeout(function(){
+    var bundle = {
+      records: JSON.parse(localStorage.getItem('sgg_records')||'[]'),
+      teachers: JSON.parse(localStorage.getItem('sgg_teachers')||'[]'),
+      schedules: JSON.parse(localStorage.getItem('sgg_schedules')||'{}'),
+      subjects: JSON.parse(localStorage.getItem('sgg_subjects')||'{}'),
+      periodConfig: JSON.parse(localStorage.getItem('sgg_periodConfig')||'null'),
+      badge: localStorage.getItem('sgg_badge')||null,
+      schoolName: localStorage.getItem('sgg_school_name')||''
+    };
+    ckCloudPush(bundle);
+  }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', function(){ ckBoot(); });
+
+// ─── Dipanggil selepas log masuk berjaya (tarik data dari cloud) ───
+async function ckOnLoginHook(){
+  var cloud = await ckCloudPull();
+  if(cloud){
+    if(cloud.records) localStorage.setItem('sgg_records', JSON.stringify(cloud.records));
+    if(cloud.teachers) localStorage.setItem('sgg_teachers', JSON.stringify(cloud.teachers));
+    if(cloud.schedules) localStorage.setItem('sgg_schedules', JSON.stringify(cloud.schedules));
+    if(cloud.subjects) localStorage.setItem('sgg_subjects', JSON.stringify(cloud.subjects));
+    if(cloud.periodConfig) localStorage.setItem('sgg_periodConfig', JSON.stringify(cloud.periodConfig));
+    if(cloud.badge) localStorage.setItem('sgg_badge', cloud.badge);
+    if(cloud.schoolName) localStorage.setItem('sgg_school_name', cloud.schoolName);
+    allRecords = JSON.parse(localStorage.getItem('sgg_records') || '[]');
+    teachers = JSON.parse(localStorage.getItem('sgg_teachers') || '[]');
+    teacherSchedules = JSON.parse(localStorage.getItem('sgg_schedules') || '{}');
+    teacherSubjects = JSON.parse(localStorage.getItem('sgg_subjects') || '{}');
+    periodConfig = JSON.parse(localStorage.getItem('sgg_periodConfig') || 'null') || defaultPeriodConfig();
+    badgeImage = localStorage.getItem('sgg_badge') || null;
+    var nameInp=document.getElementById('school-name-edit');
+    var savedName=localStorage.getItem('sgg_school_name')||'SK Contoh';
+    if(nameInp) nameInp.value=savedName;
+    var hdrEl=document.getElementById('header-school');
+    if(hdrEl) hdrEl.textContent=savedName;
+  }
+  refreshAll();
+}
+
+let allRecords = JSON.parse(localStorage.getItem('sgg_records') || '[]');
 let teachers = JSON.parse(localStorage.getItem('sgg_teachers') || '[]');
 let teacherSchedules = JSON.parse(localStorage.getItem('sgg_schedules') || '{}');
 let teacherSubjects = JSON.parse(localStorage.getItem('sgg_subjects') || '{}');
+
+function defaultPeriodConfig() {
+  const times = [
+    ['07:30','08:00'],['08:00','08:30'],['08:30','09:00'],['09:00','09:30'],
+    ['09:30','10:00'],['10:00','10:30'],['10:30','11:00'],['11:00','11:30'],
+    ['11:30','12:00'],['12:00','12:30']
+  ];
+  return times.map((t,i) => ({ label: 'Waktu ' + (i+1), start: t[0], end: t[1] }));
+}
+let periodConfig = JSON.parse(localStorage.getItem('sgg_periodConfig') || 'null') || defaultPeriodConfig();
+function getPeriodLabels() { return periodConfig.map(p => p.label); }
+function getPeriodObj(label) { return periodConfig.find(p => p.label === label); }
+function formatPeriodLabel(label) {
+  const p = getPeriodObj(label);
+  return (p && p.start && p.end) ? `${label} (${p.start}-${p.end})` : label;
+}
+function getDayIdx(dateStr) {
+  const d = new Date(dateStr);
+  return (d.getDay() + 6) % 7; // Isnin = 0 ... Ahad = 6
+}
+function countClassesToday(teacher, dayIdx) {
+  const scheduleJson = teacherSchedules[teacher];
+  if (!scheduleJson) return 0;
+  const schedule = JSON.parse(scheduleJson);
+  const labels = getPeriodLabels();
+  let count = 0;
+  labels.forEach((_, pIdx) => { if (schedule[`${dayIdx}-${pIdx}`]) count++; });
+  return count;
+}
 let currentTab = 'dashboard';
 let pendingDeleteRecord = null;
 let currentScheduleTeacher = null;
@@ -351,6 +619,7 @@ const defaultConfig = {
 };
 
 // ========== ELEMENT SDK ==========
+if (window.elementSdk && typeof window.elementSdk.init === 'function') {
 window.elementSdk.init({
   defaultConfig,
   onConfigChange: async (config) => {
@@ -408,8 +677,18 @@ window.elementSdk.init({
     ['school_name', config.school_name || defaultConfig.school_name]
   ])
 });
+} // end elementSdk guard
 
 // ========== DATA SDK ==========
+// This app works two ways: (1) hosted inside a builder platform that
+// injects /_sdk/element_sdk.js + /_sdk/data_sdk.js, or (2) hosted
+// standalone (e.g. GitHub Pages) with no backend at all. If those SDK
+// scripts are missing, we transparently fall back to localStorage so
+// the app still works fully offline/standalone.
+function persistRecordsLocal() {
+  localStorage.setItem('sgg_records', JSON.stringify(allRecords));reliefCloudPush();
+}
+
 const dataHandler = {
   onDataChanged(data) {
     const recs = data.filter(d => d.type === 'record');
@@ -421,7 +700,7 @@ const dataHandler = {
     const teacherNames = tchs.map(t => t.absent_teacher).filter(Boolean);
     if (teacherNames.length > 0 || teachers.length === 0) {
       teachers = [...new Set([...teacherNames, ...teachers])];
-      localStorage.setItem('sgg_teachers', JSON.stringify(teachers));
+      localStorage.setItem('sgg_teachers', JSON.stringify(teachers));reliefCloudPush();
     }
 
     refreshAll();
@@ -429,9 +708,56 @@ const dataHandler = {
 };
 
 (async () => {
-  const r = await window.dataSdk.init(dataHandler);
-  if (!r.isOk) console.error('Data SDK init failed');
+  if (window.dataSdk && typeof window.dataSdk.init === 'function') {
+    try {
+      const r = await window.dataSdk.init(dataHandler);
+      if (r && r.isOk) return;
+      console.error('Data SDK init failed, falling back to local storage');
+    } catch (e) {
+      console.error('Data SDK error, falling back to local storage', e);
+    }
+  }
+  // Standalone fallback: allRecords/teachers already loaded from localStorage above.
+  refreshAll();
 })();
+
+// Helpers used by entry form / delete / CSV import — try the platform
+// SDK first (if present), otherwise persist straight to localStorage.
+async function saveRecord(record) {
+  if (window.dataSdk && typeof window.dataSdk.create === 'function') {
+    try {
+      const r = await window.dataSdk.create(record);
+      if (r && r.isOk) return r;
+    } catch (e) { console.error('dataSdk create failed, using local storage', e); }
+  }
+  record.id = record.id || ('r_' + Date.now() + '_' + Math.random().toString(36).slice(2,8));
+  allRecords.unshift(record);
+  persistRecordsLocal();
+  refreshAll();
+  return { isOk: true };
+}
+
+async function deleteRecord(rec) {
+  if (window.dataSdk && typeof window.dataSdk.delete === 'function') {
+    try {
+      const r = await window.dataSdk.delete(rec);
+      if (r && r.isOk) return r;
+    } catch (e) { console.error('dataSdk delete failed, using local storage', e); }
+  }
+  allRecords = allRecords.filter(r => r !== rec && r.id !== rec.id);
+  persistRecordsLocal();
+  refreshAll();
+  return { isOk: true };
+}
+
+async function saveTeacherRemote(name) {
+  if (window.dataSdk && typeof window.dataSdk.create === 'function') {
+    try {
+      return await window.dataSdk.create({ type: 'teacher', absent_teacher: name, date:'', day:'', reason:'', period:'', class_name:'', subject:'', relief_teacher:'', created_at: new Date().toISOString() });
+    } catch (e) { console.error('dataSdk teacher sync failed (safe to ignore if offline/standalone)', e); }
+  }
+  return { isOk: true };
+}
 
 // ========== HELPERS ==========
 function toast(msg, color='#10b981') {
@@ -454,14 +780,13 @@ function getDayName(dateStr) {
 
 function switchTab(tab) {
   currentTab = tab;
-  ['dashboard','entry','teachers','subjects','schedule','records','analysis'].forEach(t => {
+  ['dashboard','entry','teachers','schedule','records','analysis'].forEach(t => {
     document.getElementById('page-'+t).classList.toggle('hidden', t !== tab);
     const btn = document.getElementById('tab-'+t);
     btn.className = t === tab ? 'tab-active px-4 py-2 rounded-lg text-sm font-600 whitespace-nowrap transition-all' : 'tab-inactive px-4 py-2 rounded-lg text-sm font-600 whitespace-nowrap transition-all';
   });
   if (tab === 'analysis') renderAnalysis();
   if (tab === 'schedule') renderSchedulePage();
-  if (tab === 'subjects') renderSubjectsPage();
 }
 
 // ========== AUTO DATE ==========
@@ -473,7 +798,7 @@ document.getElementById('f-day').value = getDayName(new Date().toISOString().sli
 
 // ========== TEACHERS ==========
 function saveTeachersToSDK(name) {
-  return window.dataSdk.create({ type: 'teacher', absent_teacher: name, date:'', day:'', reason:'', period:'', class_name:'', subject:'', relief_teacher:'', created_at: new Date().toISOString() });
+  return saveTeacherRemote(name);
 }
 
 async function addTeacher() {
@@ -482,7 +807,7 @@ async function addTeacher() {
   if (!name) return;
   if (teachers.includes(name)) { toast('Guru sudah wujud','#f59e0b'); return; }
   teachers.push(name);
-  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));
+  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));reliefCloudPush();
   await saveTeachersToSDK(name);
   inp.value = '';
   refreshAll();
@@ -491,7 +816,10 @@ async function addTeacher() {
 
 async function removeTeacher(name) {
   teachers = teachers.filter(t => t !== name);
-  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));
+  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));reliefCloudPush();
+  delete teacherSubjects[name];
+  localStorage.setItem('sgg_subjects', JSON.stringify(teacherSubjects));reliefCloudPush();
+  delete subjectSlotCounts[name];
   refreshAll();
   toast('Guru dipadam','#ef4444');
 }
@@ -521,7 +849,7 @@ async function processCSVTeachers() {
       added++;
     }
   }
-  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));
+  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));reliefCloudPush();
   hideModal('csv-teacher-modal');
   refreshAll();
   
@@ -544,166 +872,208 @@ let currentMode = 'auto';
 
 function switchMode(mode) {
   currentMode = mode;
-  const autoPanelBtn = document.getElementById('mode-auto-btn');
-  const manualPanelBtn = document.getElementById('mode-manual-btn');
-  const autoPanel = document.getElementById('mode-auto-panel');
-  const manualPanel = document.getElementById('mode-manual-panel');
-  const reliefSel = document.getElementById('f-relief');
+  const autoBtn = document.getElementById('mode-auto-btn');
+  const manualBtn = document.getElementById('mode-manual-btn');
 
   if (mode === 'auto') {
-    autoPanelBtn.className = 'flex-1 text-xs font-600 py-1.5 rounded-lg bg-sky-100 text-sky-700 border border-sky-300 transition';
-    manualPanelBtn.className = 'flex-1 text-xs font-600 py-1.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 transition';
-    autoPanel.classList.remove('hidden');
-    manualPanel.classList.add('hidden');
-    reliefSel.removeAttribute('required');
-    renderReliefsRanking();
+    autoBtn.className = 'flex-1 py-2.5 rounded-lg text-sm font-600 transition-all flex items-center justify-center gap-2 bg-blue-100 text-blue-700 border-2 border-blue-300';
+    manualBtn.className = 'flex-1 py-2.5 rounded-lg text-sm font-600 transition-all flex items-center justify-center gap-2 bg-slate-100 text-slate-600 border-2 border-slate-200';
   } else {
-    autoPanelBtn.className = 'flex-1 text-xs font-600 py-1.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 transition';
-    manualPanelBtn.className = 'flex-1 text-xs font-600 py-1.5 rounded-lg bg-sky-100 text-sky-700 border border-sky-300 transition';
-    autoPanel.classList.add('hidden');
-    manualPanel.classList.remove('hidden');
-    reliefSel.setAttribute('required', 'true');
-    reliefSel.value = '';
+    autoBtn.className = 'flex-1 py-2.5 rounded-lg text-sm font-600 transition-all flex items-center justify-center gap-2 bg-slate-100 text-slate-600 border-2 border-slate-200';
+    manualBtn.className = 'flex-1 py-2.5 rounded-lg text-sm font-600 transition-all flex items-center justify-center gap-2 bg-blue-100 text-blue-700 border-2 border-blue-300';
   }
-}
-
-// ========== RENDER RELIEF RANKING ==========
-function renderReliefsRanking() {
-  const absent = document.getElementById('f-absent').value;
-  const date = document.getElementById('f-date').value;
-  const period = document.getElementById('f-period').value;
-  const container = document.getElementById('relief-ranking');
-
-  if (!absent || !date || !period) {
-    container.innerHTML = '<p class="text-slate-400 text-xs">Pilih guru tidak hadir, tarikh & waktu dahulu</p>';
-    return;
-  }
-
-  // Get candidates with full logic
-  const candidates = getAvailableCandidates(absent, date, period);
-
-  if (candidates.length === 0) {
-    container.innerHTML = '<p class="text-slate-400 text-xs">❌ Tiada guru tersedia</p>';
-    return;
-  }
-
-  // Rank candidates
-  const rankData = candidates.map(name => {
-    const reliefCountToday = allRecords.filter(r => r.date === date && r.relief_teacher === name).length;
-    const reliefCountTotal = allRecords.filter(r => r.relief_teacher === name).length;
-    return { name, reliefCountToday, reliefCountTotal };
-  });
-
-  rankData.sort((a, b) => {
-    if (a.reliefCountToday !== b.reliefCountToday) return a.reliefCountToday - b.reliefCountToday;
-    return a.reliefCountTotal - b.reliefCountTotal;
-  });
-
-  // Render ranking
-  container.innerHTML = rankData.map((r, idx) => {
-    const isTop = idx === 0;
-    return `<div class="flex items-center gap-2 p-2 rounded-lg ${isTop ? 'bg-sky-50 border border-sky-200' : 'bg-white border border-slate-100'} cursor-pointer hover:bg-sky-50 transition" onclick="selectReliefFromRanking('${r.name}')">
-      <div class="text-xs font-800 ${isTop ? 'text-sky-600' : 'text-slate-400'}">#${idx + 1}</div>
-      <div class="flex-1">
-        <div class="text-xs font-600 text-slate-800">${r.name}</div>
-        <div class="text-xs text-slate-500">Hari ini: ${r.reliefCountToday}x | Jumlah: ${r.reliefCountTotal}x</div>
-      </div>
-      ${isTop ? '<span class="text-lg">⭐</span>' : ''}
-    </div>`;
-  }).join('');
-}
-
-function selectReliefFromRanking(name) {
-  document.getElementById('f-relief').value = name;
-  toast(`✓ ${name} dipilih`, '#10b981');
+  renderPeriodSlots();
 }
 
 // ========== GET AVAILABLE CANDIDATES ==========
+// A candidate is "available" if: not the absent teacher, not already
+// assigned as relief for this exact date+period, not absent themselves
+// on this date, and critically NOT scheduled to teach their own class
+// at this exact period (so no clash between their real class and the
+// class they'd be covering).
 function getAvailableCandidates(absent, date, period) {
-  // Count relief frequency
-  const freq = {};
-  teachers.forEach(t => freq[t] = 0);
-  allRecords.forEach(r => { if (r.relief_teacher) freq[r.relief_teacher] = (freq[r.relief_teacher]||0) + 1; });
+  const periods = getPeriodLabels();
+  const periodIdx = periods.indexOf(period);
+  const dayIdx = getDayIdx(date);
 
-  // Count relief on same DAY
-  const frequencyOnDay = {};
-  teachers.forEach(t => frequencyOnDay[t] = 0);
-  allRecords.filter(r => r.date === date).forEach(r => {
-    if (r.relief_teacher) frequencyOnDay[r.relief_teacher] = (frequencyOnDay[r.relief_teacher]||0) + 1;
-  });
-
-  // Check who's already relieving on same date+period
+  // Who's already covering another class in this exact date+period
   const busyOnSlot = new Set(allRecords.filter(r => r.date === date && r.period === period).map(r => r.relief_teacher));
-  // Check who's absent on same date
+  // Who's absent on this date
   const absentOnDate = new Set(allRecords.filter(r => r.date === date).map(r => r.absent_teacher));
-  // Check who has teaching duties on this period
+  // Who has their own teaching duty at this exact period (would clash)
   const teachingOnPeriod = new Set();
   teachers.forEach(t => {
     const scheduleJson = teacherSchedules[t];
     if (scheduleJson) {
       const schedule = JSON.parse(scheduleJson);
-      const periods = ['Waktu 1', 'Waktu 2', 'Waktu 3', 'Waktu 4', 'Waktu 5', 'Waktu 6', 'Waktu 7', 'Waktu 8'];
-      const periodIdx = periods.indexOf(period);
-      
-      // Get day index from date
-      const d = new Date(date);
-      const dayIdx = (d.getDay() + 6) % 7; // Monday = 0, Sunday = 6
-      
       const key = `${dayIdx}-${periodIdx}`;
       if (schedule[key]) teachingOnPeriod.add(t);
     }
   });
 
-  const candidates = teachers.filter(t => 
-    t !== absent && 
-    !busyOnSlot.has(t) && 
-    !absentOnDate.has(t) &&
-    !teachingOnPeriod.has(t) &&
-    frequencyOnDay[t] < 3  // Max 3 reliefs per day per teacher
-  );
-
-  return candidates;
-}
-
-// ========== AI AUTO ASSIGN ==========
-function autoAssignRelief() {
-  const absent = document.getElementById('f-absent').value;
-  const date = document.getElementById('f-date').value;
-  const period = document.getElementById('f-period').value;
-
-  if (!absent || !date || !period) {
-    toast('Pilih guru tidak hadir, tarikh & waktu','#f59e0b');
-    return;
-  }
-
-  const candidates = getAvailableCandidates(absent, date, period);
-
-  if (candidates.length === 0) {
-    toast('❌ Tiada guru tersedia pada waktu ini','#ef4444');
-    return;
-  }
-
-  // Rank and pick top
-  const freq = {};
-  teachers.forEach(t => freq[t] = 0);
-  allRecords.forEach(r => { if (r.relief_teacher) freq[r.relief_teacher] = (freq[r.relief_teacher]||0) + 1; });
-
+  // Cap relief load per teacher per day
   const frequencyOnDay = {};
   teachers.forEach(t => frequencyOnDay[t] = 0);
   allRecords.filter(r => r.date === date).forEach(r => {
     if (r.relief_teacher) frequencyOnDay[r.relief_teacher] = (frequencyOnDay[r.relief_teacher]||0) + 1;
   });
 
-  candidates.sort((a,b) => {
-    const dayDiff = frequencyOnDay[a] - frequencyOnDay[b];
-    if (dayDiff !== 0) return dayDiff;
-    return (freq[a]||0) - (freq[b]||0);
+  return teachers.filter(t =>
+    t !== absent &&
+    !busyOnSlot.has(t) &&
+    !absentOnDate.has(t) &&
+    !teachingOnPeriod.has(t) &&
+    frequencyOnDay[t] < 3  // Max 3 reliefs per day per teacher
+  );
+}
+
+// ========== RANK CANDIDATES ==========
+// Priority order:
+//  1) Guru yang TIADA kelas langsung pada hari itu (classesToday = 0)
+//  2) Guru dengan bilangan kelas PALING SEDIKIT pada hari itu
+//  3) Guru yang paling kurang menggantikan hari ini
+//  4) Guru yang paling kurang menggantikan secara keseluruhan
+function rankCandidates(absent, date, period) {
+  const dayIdx = getDayIdx(date);
+  const candidates = getAvailableCandidates(absent, date, period);
+
+  const freqTotal = {};
+  teachers.forEach(t => freqTotal[t] = 0);
+  allRecords.forEach(r => { if (r.relief_teacher) freqTotal[r.relief_teacher] = (freqTotal[r.relief_teacher]||0) + 1; });
+
+  const freqToday = {};
+  teachers.forEach(t => freqToday[t] = 0);
+  allRecords.filter(r => r.date === date).forEach(r => {
+    if (r.relief_teacher) freqToday[r.relief_teacher] = (freqToday[r.relief_teacher]||0) + 1;
   });
 
-  const chosen = candidates[0];
-  document.getElementById('f-relief').value = chosen;
-  const dayCount = frequencyOnDay[chosen] || 0;
-  toast(`✓ ${chosen} dipilih otomatis (hari ini: ${dayCount}x)`, '#3b82f6');
+  const ranked = candidates.map(name => ({
+    name,
+    classesToday: countClassesToday(name, dayIdx),
+    reliefToday: freqToday[name] || 0,
+    reliefTotal: freqTotal[name] || 0
+  }));
+
+  ranked.sort((a, b) => {
+    if (a.classesToday !== b.classesToday) return a.classesToday - b.classesToday;
+    if (a.reliefToday !== b.reliefToday) return a.reliefToday - b.reliefToday;
+    return a.reliefTotal - b.reliefTotal;
+  });
+
+  return ranked;
+}
+
+// ========== MULTI-SLOT PERIOD PICKER ==========
+// Sebab: seorang guru selalunya ada BEBERAPA slot kelas dalam satu hari.
+// Tekan "+ Tambah Slot" untuk tambah baris waktu lain, setiap baris ada
+// pilihan waktu sendiri dan cadangan/pilihan guru ganti sendiri (auto
+// atau manual) supaya tiada pertindihan.
+let slotRows = [];        // [{ id, period, class_name, subject, relief_teacher }]
+let slotIdCounter = 0;
+
+function addSlotRow() {
+  slotIdCounter++;
+  slotRows.push({ id: 'slot_' + slotIdCounter, period: '', class_name: '', subject: '', relief_teacher: '' });
+  renderPeriodSlots();
+}
+
+function removeSlotRow(id) {
+  slotRows = slotRows.filter(r => r.id !== id);
+  if (slotRows.length === 0) addSlotRow();
+  else renderPeriodSlots();
+}
+
+function updateSlotRowField(id, field, value) {
+  const row = slotRows.find(r => r.id === id);
+  if (!row) return;
+  row[field] = value;
+  if (field === 'period') {
+    row.relief_teacher = ''; // waktu ditukar -> reset pilihan guru ganti
+    renderPeriodSlots();
+  }
+}
+
+function pickSlotRelief(id, name) {
+  const row = slotRows.find(r => r.id === id);
+  if (!row) return;
+  row.relief_teacher = name;
+  renderPeriodSlots();
+}
+
+function renderPeriodSlots() {
+  const container = document.getElementById('period-slots-container');
+  if (!container) return;
+  const absentEl = document.getElementById('f-absent');
+  const dateEl = document.getElementById('f-date');
+  const absent = absentEl ? absentEl.value : '';
+  const date = dateEl ? dateEl.value : '';
+  const labels = getPeriodLabels();
+
+  if (slotRows.length === 0) addSlotRow(); // sentiasa ada sekurang-kurangnya 1 baris
+
+  const rowsHtml = slotRows.map(row => {
+    const usedElsewhere = slotRows.filter(r => r.id !== row.id).map(r => r.period).filter(Boolean);
+    const period = row.period;
+
+    const periodOptionsHtml = '<option value="">-- Pilih Waktu --</option>' + labels.map(l => {
+      const lEsc = l.replace(/"/g, '&quot;');
+      const disabled = usedElsewhere.includes(l) ? 'disabled' : '';
+      const selected = period === l ? 'selected' : '';
+      const suffix = usedElsewhere.includes(l) ? ' (sudah dipilih)' : '';
+      return `<option value="${lEsc}" ${selected} ${disabled}>${formatPeriodLabel(l).replace(/</g,'&lt;')}${suffix}</option>`;
+    }).join('');
+
+    let reliefPickerHtml;
+    if (!period) {
+      reliefPickerHtml = '<p class="text-xs text-slate-400">Pilih waktu dahulu</p>';
+    } else if (!absent || !date) {
+      reliefPickerHtml = '<p class="text-xs text-slate-400">Pilih guru tidak hadir & tarikh dahulu</p>';
+    } else if (currentMode === 'auto') {
+      const ranked = rankCandidates(absent, date, period).slice(0, 5);
+      if (!row.relief_teacher && ranked.length > 0) {
+        row.relief_teacher = ranked[0].name; // auto pra-isi calon terbaik
+      }
+      if (ranked.length === 0) {
+        reliefPickerHtml = '<p class="text-xs text-rose-500">❌ Tiada guru tersedia pada waktu ini</p>';
+      } else {
+        reliefPickerHtml = '<div class="space-y-1">' + ranked.map(r => {
+          const isPicked = row.relief_teacher === r.name;
+          const isFree = r.classesToday === 0;
+          const nEsc = r.name.replace(/'/g, "\\'");
+          return `<div onclick="pickSlotRelief('${row.id}','${nEsc}')" class="flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer text-xs ${isPicked ? 'bg-sky-100 border border-sky-300' : 'bg-white border border-slate-100 hover:bg-slate-50'}">
+            <span class="font-600 ${isPicked ? 'text-sky-700' : 'text-slate-700'}">${r.name}</span>
+            ${isFree ? '<span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-600">Bebas</span>' : `<span class="text-slate-400">${r.classesToday} kelas</span>`}
+            ${isPicked ? '<span class="ml-auto text-sky-600 font-700">✓</span>' : ''}
+          </div>`;
+        }).join('') + '</div>';
+      }
+    } else {
+      const options = [...teachers].sort().filter(t => t !== absent);
+      reliefPickerHtml = `<select onchange="pickSlotRelief('${row.id}', this.value)" class="input-field w-full text-sm">
+        <option value="">-- Pilih Guru Ganti --</option>
+        ${options.map(t => `<option value="${t.replace(/"/g,'&quot;')}" ${row.relief_teacher===t?'selected':''}>${t}</option>`).join('')}
+      </select>`;
+    }
+
+    return `<div class="border border-slate-200 rounded-lg p-3 bg-slate-50 space-y-2">
+      <div class="flex items-center gap-2">
+        <select onchange="updateSlotRowField('${row.id}','period',this.value)" class="input-field flex-1 text-sm">${periodOptionsHtml}</select>
+        ${slotRows.length > 1 ? `<button type="button" onclick="removeSlotRow('${row.id}')" class="text-red-400 hover:text-red-600 text-xs whitespace-nowrap">Buang</button>` : ''}
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <input type="text" value="${(row.class_name||'').replace(/"/g,'&quot;')}" oninput="updateSlotRowField('${row.id}','class_name',this.value)" placeholder="Kelas (cth: 4 Bestari)" class="input-field w-full text-xs">
+        <input type="text" value="${(row.subject||'').replace(/"/g,'&quot;')}" oninput="updateSlotRowField('${row.id}','subject',this.value)" placeholder="Mata Pelajaran" class="input-field w-full text-xs">
+      </div>
+      <div>
+        <div class="text-xs font-600 text-slate-500 mb-1">Guru Ganti</div>
+        ${reliefPickerHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = rowsHtml + `<button type="button" onclick="addSlotRow()" class="w-full text-sm text-emerald-600 hover:text-emerald-800 border-2 border-dashed border-emerald-300 rounded-lg py-2 font-600 flex items-center justify-center gap-1.5 transition hover:bg-emerald-50"><i data-lucide="plus" style="width:14px;height:14px"></i> Tambah Slot Waktu Lain</button>`;
+
+  if (window.lucide) lucide.createIcons();
 }
 
 // ========== ENTRY FORM ==========
@@ -711,61 +1081,70 @@ document.getElementById('entry-form').addEventListener('submit', async function(
   e.preventDefault();
   if (allRecords.length >= 999) { toast('Had 999 rekod dicapai!','#ef4444'); return; }
 
-  const btn = document.getElementById('btn-submit');
-  btn.disabled = true;
-  btn.textContent = 'Menyimpan...';
+  const validRows = slotRows.filter(r => r.period);
+  if (validRows.length === 0) {
+    toast('Sila pilih sekurang-kurangnya satu waktu/slot','#f59e0b');
+    return;
+  }
 
-  // For manual mode, validate relief is selected
-  if (currentMode === 'manual') {
-    const relief = document.getElementById('f-relief').value;
-    if (!relief) {
-      btn.disabled = false;
-      btn.innerHTML = '<i data-lucide="plus-circle" style="width:16px;height:16px"></i> Simpan Rekod';
-      lucide.createIcons();
-      toast('Sila pilih guru ganti','#f59e0b');
+  for (const row of validRows) {
+    if (!row.class_name.trim() || !row.subject.trim()) {
+      toast(`Sila lengkapkan Kelas & Subjek untuk ${formatPeriodLabel(row.period)}`,'#f59e0b');
+      return;
+    }
+    if (!row.relief_teacher) {
+      toast(`Sila pilih guru ganti untuk ${formatPeriodLabel(row.period)}`,'#f59e0b');
       return;
     }
   }
 
-  const record = {
-    type: 'record',
-    date: document.getElementById('f-date').value,
-    day: document.getElementById('f-day').value,
-    absent_teacher: document.getElementById('f-absent').value,
-    reason: document.getElementById('f-reason').value,
-    period: document.getElementById('f-period').value,
-    class_name: document.getElementById('f-class').value,
-    subject: document.getElementById('f-subject').value,
-    relief_teacher: document.getElementById('f-relief').value,
-    created_at: new Date().toISOString(),
-    relief_mode: currentMode
-  };
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Menyimpan...';
 
-  const result = await window.dataSdk.create(record);
+  const date = document.getElementById('f-date').value;
+  const day = document.getElementById('f-day').value;
+  const absent = document.getElementById('f-absent').value;
+  const reason = document.getElementById('f-reason').value;
+
+  let successCount = 0;
+  for (const row of validRows) {
+    const record = {
+      type: 'record',
+      date, day,
+      absent_teacher: absent,
+      reason,
+      period: row.period,
+      class_name: row.class_name.trim(),
+      subject: row.subject.trim(),
+      relief_teacher: row.relief_teacher,
+      created_at: new Date().toISOString(),
+      relief_mode: currentMode
+    };
+    const result = await saveRecord(record);
+    if (result.isOk) successCount++;
+  }
+
   btn.disabled = false;
   btn.innerHTML = '<i data-lucide="plus-circle" style="width:16px;height:16px"></i> Simpan Rekod';
   lucide.createIcons();
 
-  if (result.isOk) {
-    toast('✓ Rekod disimpan & backup dimuat turun!');
-    document.getElementById('f-class').value = '';
-    document.getElementById('f-subject').value = '';
-    // Auto-backup ke Downloads folder
+  if (successCount === validRows.length) {
+    toast(`✓ ${successCount} rekod disimpan & backup dimuat turun!`);
+    slotRows = [];
+    addSlotRow();
     setTimeout(() => autoBackupCSV(), 300);
   } else {
-    toast('Gagal menyimpan','#ef4444');
+    toast(`${successCount}/${validRows.length} rekod berjaya disimpan`,'#f59e0b');
   }
 });
 
-// ========== ON DATE/ABSENT CHANGE - UPDATE RANKING ==========
+// ========== ON DATE/ABSENT CHANGE - UPDATE SLOT PICKER ==========
 document.getElementById('f-date').addEventListener('change', () => {
-  if (currentMode === 'auto') renderReliefsRanking();
+  renderPeriodSlots();
 });
 document.getElementById('f-absent').addEventListener('change', () => {
-  if (currentMode === 'auto') renderReliefsRanking();
-});
-document.getElementById('f-period').addEventListener('change', () => {
-  if (currentMode === 'auto') renderReliefsRanking();
+  renderPeriodSlots();
 });
 
 // ========== DELETE ==========
@@ -774,10 +1153,64 @@ function confirmDelete(rec) {
   document.getElementById('delete-confirm').classList.remove('hidden');
   document.getElementById('confirm-delete-btn').onclick = async () => {
     hideModal('delete-confirm');
-    const r = await window.dataSdk.delete(pendingDeleteRecord);
+    const r = await deleteRecord(pendingDeleteRecord);
     if (r.isOk) toast('Rekod dipadam','#ef4444');
     else toast('Gagal memadam','#ef4444');
   };
+}
+
+// ========== SCHEDULE ==========
+function renderPeriodSettings() {
+  const container = document.getElementById('period-settings-list');
+  if (!container) return;
+  container.innerHTML = periodConfig.map((p, idx) => `
+    <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-2">
+      <span class="text-xs font-600 text-slate-500 w-6">${idx+1}</span>
+      <input type="text" class="period-label border border-slate-300 rounded px-2 py-1 text-xs flex-1" value="${(p.label||'').replace(/"/g,'&quot;')}" placeholder="Label waktu">
+      <input type="time" class="period-start border border-slate-300 rounded px-2 py-1 text-xs" value="${p.start||''}">
+      <span class="text-xs text-slate-400">-</span>
+      <input type="time" class="period-end border border-slate-300 rounded px-2 py-1 text-xs" value="${p.end||''}">
+      <button onclick="removePeriodRowUI(${idx})" class="text-red-400 hover:text-red-600 text-xs px-1" title="Buang waktu ini">\u2715</button>
+    </div>
+  `).join('');
+}
+
+function addPeriodRowUI() {
+  const n = periodConfig.length + 1;
+  periodConfig.push({ label: 'Waktu ' + n, start: '', end: '' });
+  renderPeriodSettings();
+}
+
+function removePeriodRowUI(idx) {
+  if (periodConfig.length <= 1) { toast('Perlu ada sekurang-kurangnya 1 waktu', '#f59e0b'); return; }
+  periodConfig.splice(idx, 1);
+  renderPeriodSettings();
+}
+
+function savePeriodSettings() {
+  const labels = document.querySelectorAll('#period-settings-list .period-label');
+  const starts = document.querySelectorAll('#period-settings-list .period-start');
+  const ends = document.querySelectorAll('#period-settings-list .period-end');
+  const newConfig = [];
+  labels.forEach((el, i) => {
+    const label = el.value.trim() || ('Waktu ' + (i + 1));
+    newConfig.push({ label, start: starts[i] ? starts[i].value : '', end: ends[i] ? ends[i].value : '' });
+  });
+  periodConfig = newConfig;
+  localStorage.setItem('sgg_periodConfig', JSON.stringify(periodConfig));reliefCloudPush();
+  renderPeriodSettings();
+  populatePeriodDropdown();
+  if (document.getElementById('schedule-teacher')) renderScheduleGrid();
+  renderScheduleList();
+  toast('\u2713 Tetapan waktu disimpan! Jadual & borang dikemaskini.');
+}
+
+function populatePeriodDropdown() {
+  // Bersihkan mana-mana baris slot yang waktunya sudah tak wujud
+  // (contoh: selepas waktu dipadam di Tetapan Waktu Sekolah).
+  const validLabels = new Set(getPeriodLabels());
+  slotRows.forEach(row => { if (row.period && !validLabels.has(row.period)) { row.period = ''; row.relief_teacher = ''; } });
+  renderPeriodSlots();
 }
 
 // ========== SCHEDULE ==========
@@ -794,6 +1227,7 @@ function renderSchedulePage() {
   });
   sel.value = val;
 
+  renderPeriodSettings();
   renderScheduleGrid();
   renderScheduleList();
 }
@@ -811,7 +1245,7 @@ function renderScheduleGrid() {
   const schedule = teacherSchedules[teacher] ? JSON.parse(teacherSchedules[teacher]) : {};
   
   const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu', 'Ahad'];
-  const periods = ['Waktu 1', 'Waktu 2', 'Waktu 3', 'Waktu 4', 'Waktu 5', 'Waktu 6', 'Waktu 7', 'Waktu 8', 'Waktu 9', 'Waktu 10'];
+  const periods = getPeriodLabels();
 
   // Build HTML grid
   let html = '<div class="overflow-x-auto">';
@@ -826,7 +1260,7 @@ function renderScheduleGrid() {
 
   // Data rows - time slots
   periods.forEach((period, pIdx) => {
-    html += `<tr><td class="border border-slate-300 bg-slate-100 px-2 py-1.5 font-600 text-center text-xs">${period}</td>`;
+    html += `<tr><td class="border border-slate-300 bg-slate-100 px-2 py-1.5 font-600 text-center text-xs">${formatPeriodLabel(period)}</td>`;
     days.forEach((day, dIdx) => {
       const key = `${dIdx}-${pIdx}`;
       const isChecked = schedule[key];
@@ -854,7 +1288,7 @@ function saveTeacherSchedule() {
   });
 
   teacherSchedules[teacher] = JSON.stringify(checked);
-  localStorage.setItem('sgg_schedules', JSON.stringify(teacherSchedules));
+  localStorage.setItem('sgg_schedules', JSON.stringify(teacherSchedules));reliefCloudPush();
 
   renderScheduleList();
   toast(`Jadual mingguan ${teacher} disimpan!`);
@@ -873,7 +1307,7 @@ function renderScheduleList() {
 
   container.innerHTML = sorted.map(([teacher, scheduleJson]) => {
     const schedule = JSON.parse(scheduleJson);
-    const periods = ['Waktu 1', 'Waktu 2', 'Waktu 3', 'Waktu 4', 'Waktu 5', 'Waktu 6', 'Waktu 7', 'Waktu 8'];
+    const periods = getPeriodLabels();
     
     // Build summary
     let summary = {};
@@ -905,87 +1339,14 @@ function renderScheduleList() {
 
 function deleteSchedule(teacher) {
   delete teacherSchedules[teacher];
-  localStorage.setItem('sgg_schedules', JSON.stringify(teacherSchedules));
+  localStorage.setItem('sgg_schedules', JSON.stringify(teacherSchedules));reliefCloudPush();
   renderScheduleList();
   toast('Jadual dipadam','#ef4444');
 }
 
-// ========== SUBJECTS ==========
-function renderSubjectsPage() {
-  const sel = document.getElementById('subject-teacher');
-  const sorted = [...teachers].sort();
-  const val = sel.value;
-  sel.innerHTML = '<option value="">-- Pilih Guru --</option>';
-  sorted.forEach(t => {
-    const o = document.createElement('option');
-    o.value = t;
-    o.textContent = t;
-    sel.appendChild(o);
-  });
-  sel.value = val;
-
-  renderSubjectList();
-  loadTeacherSubjects();
-}
-
-function loadTeacherSubjects() {
-  const teacher = document.getElementById('subject-teacher').value;
-  const textarea = document.getElementById('subject-input');
-  if (!teacher) {
-    textarea.value = '';
-  } else {
-    const subjects = teacherSubjects[teacher] || '';
-    textarea.value = subjects;
-  }
-}
-
-function saveTeacherSubjects() {
-  const teacher = document.getElementById('subject-teacher').value;
-  const subjects = document.getElementById('subject-input').value.trim();
-  if (!teacher) {
-    toast('Sila pilih guru','#f59e0b');
-    return;
-  }
-  teacherSubjects[teacher] = subjects;
-  localStorage.setItem('sgg_subjects', JSON.stringify(teacherSubjects));
-  renderSubjectList();
-  toast(`Subjek ${teacher} disimpan!`);
-}
-
-function renderSubjectList() {
-  const container = document.getElementById('subject-list');
-  const sorted = Object.entries(teacherSubjects).sort((a,b) => a[0].localeCompare(b[0]));
-
-  if (sorted.length === 0) {
-    container.innerHTML = '<p class="text-slate-400">Belum ada data subjek guru</p>';
-    return;
-  }
-
-  container.innerHTML = sorted.map(([teacher, subjects]) => {
-    const subjectsList = subjects.split(',').map(s => s.trim()).filter(Boolean);
-    return `<div class="bg-slate-50 rounded-lg p-3 border border-slate-200 mb-2">
-      <div class="flex items-start justify-between mb-2">
-        <span class="font-600 text-slate-800">${teacher}</span>
-        <button onclick="deleteSubjects('${teacher.replace(/'/g,"\\'")}')" class="text-red-400 hover:text-red-600 text-xs">Batal</button>
-      </div>
-      ${subjectsList.length > 0 ? `<div class="text-xs text-slate-600">
-        <span class="inline-flex flex-wrap gap-1">
-          ${subjectsList.map(s => `<span class="bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">${s}</span>`).join('')}
-        </span>
-      </div>` : '<div class="text-xs text-slate-400 italic">Tiada subjek ditetapkan</div>'}
-    </div>`;
-  }).join('');
-}
-
-function deleteSubjects(teacher) {
-  delete teacherSubjects[teacher];
-  localStorage.setItem('sgg_subjects', JSON.stringify(teacherSubjects));
-  renderSubjectList();
-  toast('Subjek dipadam','#ef4444');
-}
-
 // ========== RENDER ==========
 function refreshAll() {
+  populatePeriodDropdown();
   renderTeacherDropdowns();
   renderTeacherList();
   renderDashboard();
@@ -996,7 +1357,7 @@ function refreshAll() {
 
 function renderTeacherDropdowns() {
   const sorted = [...teachers].sort();
-  ['f-absent','f-relief'].forEach(id => {
+  ['f-absent'].forEach(id => {
     const sel = document.getElementById(id);
     const val = sel.value;
     const opts = sel.querySelectorAll('option:not(:first-child)');
@@ -1010,17 +1371,55 @@ function renderTeacherDropdowns() {
   });
 }
 
+let subjectSlotCounts = {}; // in-memory only: how many subject input boxes to show per teacher
+
+function getSubjectSlotCount(teacher) {
+  const existing = (teacherSubjects[teacher] || '').split(',').map(s => s.trim()).filter(Boolean).length;
+  if (!(teacher in subjectSlotCounts)) subjectSlotCounts[teacher] = Math.max(3, existing);
+  return subjectSlotCounts[teacher];
+}
+
+function addSubjectSlotUI(teacher) {
+  subjectSlotCounts[teacher] = getSubjectSlotCount(teacher) + 1;
+  renderTeacherList();
+}
+
+function updateTeacherSubjects(teacher) {
+  const inputs = document.querySelectorAll(`.subject-input[data-teacher="${CSS.escape(teacher)}"]`);
+  const values = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
+  teacherSubjects[teacher] = values.join(', ');
+  localStorage.setItem('sgg_subjects', JSON.stringify(teacherSubjects));reliefCloudPush();
+}
+
 function renderTeacherList() {
   const el = document.getElementById('teacher-list');
   const cnt = document.getElementById('teacher-count');
   cnt.textContent = teachers.length;
   if (teachers.length === 0) { el.innerHTML = '<p class="text-slate-400 text-sm">Tiada guru. Sila tambah guru.</p>'; return; }
-  el.innerHTML = [...teachers].sort().map(t =>
-    `<div class="flex items-center justify-between py-1.5 px-2 rounded hover:bg-slate-50">
-      <span class="text-sm text-slate-700">${t}</span>
-      <button onclick="removeTeacher('${t.replace(/'/g,"\\'")}')" class="text-red-400 hover:text-red-600 text-xs">Padam</button>
-    </div>`
-  ).join('');
+
+  el.innerHTML = [...teachers].sort().map(t => {
+    const jsEsc = t.replace(/'/g, "\\'");
+    const attrEsc = t.replace(/"/g, '&quot;');
+    const subjects = (teacherSubjects[t] || '').split(',').map(s => s.trim()).filter(Boolean);
+    const slotCount = getSubjectSlotCount(t);
+    let inputsHtml = '';
+    for (let i = 0; i < slotCount; i++) {
+      const val = (subjects[i] || '').replace(/"/g, '&quot;');
+      inputsHtml += `<input type="text" class="subject-input text-xs border border-slate-300 rounded-lg px-2 py-1 w-28 focus:ring-2 focus:ring-sky-300 outline-none" placeholder="Subjek ${i+1}" value="${val}" data-teacher="${attrEsc}" onchange="updateTeacherSubjects('${jsEsc}')">`;
+    }
+    return `<div class="border border-slate-200 rounded-lg p-3 bg-white">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-600 text-slate-800">${t}</span>
+        <button onclick="removeTeacher('${jsEsc}')" class="text-red-400 hover:text-red-600 text-xs flex items-center gap-1"><i data-lucide="trash-2" style="width:12px;height:12px"></i> Padam</button>
+      </div>
+      <div class="flex flex-wrap gap-1.5 items-center">
+        ${inputsHtml}
+        <button type="button" onclick="addSubjectSlotUI('${jsEsc}')" class="text-xs text-emerald-600 hover:text-emerald-800 border border-emerald-300 rounded-lg px-2 py-1 font-600">+ Subjek</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
 }
 
 function renderDashboard() {
@@ -1224,7 +1623,7 @@ async function processImportCSV() {
     if (allRecords.length + count >= 999) { toast('Had 999 rekod!','#ef4444'); break; }
     const parts = line.split(',').map(s => s.trim());
     if (parts.length >= 7) {
-      await window.dataSdk.create({
+      await saveRecord({
         type: 'record', date: parts[0], day: getDayName(parts[0]),
         absent_teacher: parts[1], reason: parts[2], period: parts[3],
         class_name: parts[4], subject: parts[5], relief_teacher: parts[6],
@@ -1235,7 +1634,7 @@ async function processImportCSV() {
       count++;
     }
   }
-  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));
+  localStorage.setItem('sgg_teachers', JSON.stringify(teachers));reliefCloudPush();
   hideModal('import-modal');
   toast(`${count} rekod diimport!`);
 }
@@ -1349,7 +1748,20 @@ function downloadWordFile(records) {
       <div style="margin-top: 30px; text-align: center; color: #94a3b8; font-size: 11px;">
         <p>Dokumen dijana automatik oleh Sistem Guru Ganti</p>
       </div>
-    </body>
+    <script>
+// ── KEEP-ALIVE — pastikan Supabase tidak tidur ──────────────
+(function(){
+  var _kaUrl = typeof SUPA_URL !== 'undefined' ? SUPA_URL : (typeof SB_URL !== 'undefined' ? SB_URL : '');
+  var _kaKey = typeof SUPA_KEY !== 'undefined' ? SUPA_KEY : (typeof SB_KEY !== 'undefined' ? SB_KEY : '');
+  if (!_kaUrl || !_kaKey) return;
+  if (window._ekKaTimer) clearInterval(window._ekKaTimer);
+  window._ekKaTimer = setInterval(function(){
+    fetch(_kaUrl+'/rest/v1/', {headers:{'apikey':_kaKey,'Authorization':'Bearer '+_kaKey}}).catch(function(){});
+  }, 4*60*1000);
+  console.log('EduKit keep-alive started');
+})();
+</script>
+</body>
     </html>
   `;
   
@@ -1376,7 +1788,7 @@ document.getElementById('badge-upload').addEventListener('change', function(e) {
   reader.onload = function(evt) {
     const dataUrl = evt.target.result;
     badgeImage = dataUrl;
-    localStorage.setItem('sgg_badge', dataUrl);
+    localStorage.setItem('sgg_badge', dataUrl);reliefCloudPush();
     renderBadge();
     document.getElementById('badge-check').classList.remove('hidden');
     setTimeout(() => document.getElementById('badge-check').classList.add('hidden'), 3000);
@@ -1411,7 +1823,7 @@ const schoolNameInput = document.getElementById('school-name-edit');
 schoolNameInput.addEventListener('blur', function() {
   const name = this.value.trim();
   if (name) {
-    localStorage.setItem('sgg_school_name', name);
+    localStorage.setItem('sgg_school_name', name);reliefCloudPush();
     document.getElementById('header-school').textContent = name;
     toast('Nama sekolah disimpan!', '#10b981');
   }
@@ -1430,6 +1842,12 @@ document.getElementById('header-school').textContent = savedSchoolName;
 
 // Render badge on load
 renderBadge();
+
+// Init period settings UI + dropdown immediately (before dataSdk responds)
+populatePeriodDropdown();
+renderPeriodSettings();
+document.getElementById('f-date').valueAsDate = new Date();
+document.getElementById('f-day').value = getDayName(document.getElementById('f-date').value);
 </script>
  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e712b349562abd7',t:'MTc3NTMxNDY4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
