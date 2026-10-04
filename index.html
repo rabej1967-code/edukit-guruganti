@@ -338,6 +338,11 @@ var CK_TABLE = 'relief_data';
 
 var ckUrlParams = new URLSearchParams(window.location.search);
 var KOD_SEKOLAH = (ckUrlParams.get('t') || '').trim().toUpperCase();
+if(KOD_SEKOLAH){
+  try{ localStorage.setItem('ck_kod_sekolah_remembered', KOD_SEKOLAH); }catch(e){}
+}else{
+  try{ KOD_SEKOLAH = (localStorage.getItem('ck_kod_sekolah_remembered')||'').trim().toUpperCase(); }catch(e){}
+}
 
 function ckMakeEmail(username, kodSekolah){
   var u = (username||'').trim().toLowerCase().replace(/[^a-z0-9_.]/g,'');
@@ -1748,54 +1753,6 @@ function downloadWordFile(records) {
       <div style="margin-top: 30px; text-align: center; color: #94a3b8; font-size: 11px;">
         <p>Dokumen dijana automatik oleh Sistem Guru Ganti</p>
       </div>
-    <script>
-// ── KEEP-ALIVE — pastikan Supabase tidak tidur ──────────────
-(function(){
-  var _kaUrl = typeof SUPA_URL !== 'undefined' ? SUPA_URL : (typeof SB_URL !== 'undefined' ? SB_URL : '');
-  var _kaKey = typeof SUPA_KEY !== 'undefined' ? SUPA_KEY : (typeof SB_KEY !== 'undefined' ? SB_KEY : '');
-  if (!_kaUrl || !_kaKey) return;
-  if (window._ekKaTimer) clearInterval(window._ekKaTimer);
-  window._ekKaTimer = setInterval(function(){
-    fetch(_kaUrl+'/rest/v1/', {headers:{'apikey':_kaKey,'Authorization':'Bearer '+_kaKey}}).catch(function(){});
-  }, 4*60*1000);
-  console.log('EduKit keep-alive started');
-})();
-</script>
-
-<style>
-.pwd-wrap{position:relative;display:inline-block;width:100%}
-.pwd-wrap input[type=password]{padding-right:36px !important;width:100%;box-sizing:border-box}
-.pwd-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:17px;user-select:none;opacity:.55;line-height:1}
-.pwd-eye:hover{opacity:1}
-</style>
-<script>
-(function(){
-  function wrapPwd(inp){
-    if(inp.dataset.pwdWrapped) return;
-    inp.dataset.pwdWrapped='1';
-    var wrap=document.createElement('span');
-    wrap.className='pwd-wrap';
-    inp.parentNode.insertBefore(wrap, inp);
-    wrap.appendChild(inp);
-    var eye=document.createElement('span');
-    eye.className='pwd-eye';
-    eye.innerHTML='\u{1F441}\uFE0F';
-    eye.onclick=function(){
-      if(inp.type==='password'){inp.type='text';eye.style.opacity='1';}
-      else{inp.type='password';eye.style.opacity='.55';}
-    };
-    wrap.appendChild(eye);
-  }
-  function scan(){
-    document.querySelectorAll('input[type=password]').forEach(wrapPwd);
-  }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', scan);
-  } else { scan(); }
-  new MutationObserver(scan).observe(document.documentElement,{childList:true,subtree:true});
-})();
-</script>
-
 </body>
     </html>
   `;
@@ -1885,4 +1842,37 @@ document.getElementById('f-date').valueAsDate = new Date();
 document.getElementById('f-day').value = getDayName(document.getElementById('f-date').value);
 </script>
  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e712b349562abd7',t:'MTc3NTMxNDY4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<style>
+.pwd-wrap{position:relative;display:inline-block;width:100%}
+.pwd-wrap input[type=password]{padding-right:36px !important;width:100%;box-sizing:border-box}
+.pwd-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:17px;user-select:none;opacity:.55;line-height:1}
+.pwd-eye:hover{opacity:1}
+</style>
+<script>
+(function(){
+  function wrapPwd(inp){
+    if(inp.dataset.pwdWrapped) return;
+    inp.dataset.pwdWrapped='1';
+    var wrap=document.createElement('span');
+    wrap.className='pwd-wrap';
+    inp.parentNode.insertBefore(wrap, inp);
+    wrap.appendChild(inp);
+    var eye=document.createElement('span');
+    eye.className='pwd-eye';
+    eye.innerHTML='\u{1F441}\uFE0F';
+    eye.onclick=function(){
+      if(inp.type==='password'){inp.type='text';eye.style.opacity='1';}
+      else{inp.type='password';eye.style.opacity='.55';}
+    };
+    wrap.appendChild(eye);
+  }
+  function scan(){
+    document.querySelectorAll('input[type=password]').forEach(wrapPwd);
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', scan);
+  } else { scan(); }
+  new MutationObserver(scan).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
 </html>
